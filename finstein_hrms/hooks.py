@@ -247,3 +247,37 @@ app_license = "mit"
 # List of apps whose translatable strings should be excluded from this app's translations.
 # ignore_translatable_strings_from = []
 
+# Custom HRMS portability hooks (exported customizations + meal QR automation)
+fixtures = [
+    "Custom Field",
+    "Property Setter",
+    "Client Script",
+    "Server Script",
+    "Workflow",
+    "Workflow State",
+    "Role",
+    "Notification",
+    "Print Format",
+    "Workspace",
+]
+
+doc_events = {
+    "Food Count": {
+        "after_insert": "finstein_hrms.scheduled_tasks.update_food_qr_count",
+        "on_update": "finstein_hrms.scheduled_tasks.update_food_qr_count",
+    }
+}
+
+scheduler_events = {
+    "daily": [
+        "finstein_hrms.scheduled_tasks.create_food_qr_records",
+    ],
+    "cron": {
+        "0 9 * * *": ["finstein_hrms.scheduled_tasks.activate_breakfast_qr"],
+        "1 11 * * *": ["finstein_hrms.scheduled_tasks.mark_breakfast_not_consumed"],
+        "30 12 * * *": ["finstein_hrms.scheduled_tasks.activate_lunch_qr"],
+        "1 15 * * *": ["finstein_hrms.scheduled_tasks.mark_lunch_not_consumed"],
+        "0 19 * * *": ["finstein_hrms.scheduled_tasks.activate_dinner_qr"],
+        "1 22 * * *": ["finstein_hrms.scheduled_tasks.mark_dinner_not_consumed"],
+    },
+}

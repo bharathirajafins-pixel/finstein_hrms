@@ -1,0 +1,123 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "creation": "2026-02-19 10:40:23.109230",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "available",
+  "day",
+  "breakfast_section",
+  "breakfast_item",
+  "breakfast_description",
+  "lunch_section",
+  "lunch_item",
+  "lunch_description",
+  "dinner_section",
+  "dinner_item",
+  "dinner_description"
+ ],
+ "fields": [
+  {
+   "default": "1",
+   "fieldname": "available",
+   "fieldtype": "Check",
+   "in_list_view": 1,
+   "label": "Available"
+  },
+  {
+   "fieldname": "day",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "label": "Day",
+   "options": "Monday\nTuesday\nWednesday\nThursday\nFriday\nSaturday\nSunday",
+   "reqd": 1
+  },
+  {
+   "fieldname": "breakfast_section",
+   "fieldtype": "Section Break",
+   "label": "\ud83c\udf05 Breakfast"
+  },
+  {
+   "fieldname": "breakfast_item",
+   "fieldtype": "Data",
+   "label": "Item Name",
+   "reqd": 1
+  },
+  {
+   "fieldname": "breakfast_description",
+   "fieldtype": "Text",
+   "label": "Description"
+  },
+  {
+   "fieldname": "lunch_section",
+   "fieldtype": "Section Break",
+   "label": "\u2600\ufe0f Lunch"
+  },
+  {
+   "fieldname": "lunch_item",
+   "fieldtype": "Data",
+   "label": "Item Name",
+   "reqd": 1
+  },
+  {
+   "fieldname": "lunch_description",
+   "fieldtype": "Text",
+   "label": "Description"
+  },
+  {
+   "fieldname": "dinner_section",
+   "fieldtype": "Section Break",
+   "label": "\ud83c\udf19 Dinner"
+  },
+  {
+   "fieldname": "dinner_item",
+   "fieldtype": "Data",
+   "label": "Item Name",
+   "reqd": 1
+  },
+  {
+   "fieldname": "dinner_description",
+   "fieldtype": "Text",
+   "label": "Description"
+  }
+ ],
+ "grid_page_length": 50,
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2026-02-23 15:47:15.392714",
+ "modified_by": "Administrator",
+ "module": "Finstein_hrms",
+ "name": "Food Menu Item",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "All",
+   "share": 1
+  }
+ ],
+ "row_format": "Dynamic",
+ "rows_threshold_for_grid_search": 20,
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": [],
+ "track_changes": 1
+}

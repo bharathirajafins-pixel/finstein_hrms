@@ -1,0 +1,46 @@
+[
+ {
+  "docstatus": 0,
+  "doctype": "Client Script",
+  "dt": "Employee Checkin",
+  "enabled": 1,
+  "modified": "2026-02-20 13:36:25.428680",
+  "module": "HR",
+  "name": "Employee Checkin",
+  "script": "frappe.ui.form.on('Employee Checkin', {\n\n    refresh(frm) {\n\n        // =====================================================\n        // CHECK-IN NOW BUTTON\n        // =====================================================\n        if (frm.is_new() && frappe.user.has_role(\"Employee\")) {\n\n            frm.add_custom_button('Check-in Now', function () {\n\n                frm.set_value('log_type', 'IN');\n                frm.set_value('time', frappe.datetime.now_datetime());\n\n                frm.save().then(() => {\n                    frappe.show_alert({\n                        message: 'Check-in recorded successfully.',\n                        indicator: 'green'\n                    });\n                });\n\n            }).addClass('btn-primary');\n        }\n\n        // ── Alert: Not yet checked out ──\n        if (frm.doc.time && !frm.doc.checkout_time && !frm.doc.__islocal) {\n            frm.dashboard.set_headline_alert(\n                'Employee has not checked out yet.',\n                'orange'\n            );\n        }\n\n        // ── Show Working Hours ──\n        if (frm.doc.time && frm.doc.checkout_time) {\n            let checkin  = new Date(frm.doc.time);\n            let checkout = new Date(frm.doc.checkout_time);\n            let diff     = checkout - checkin;\n            let hours    = Math.floor(diff / 1000 / 60 / 60);\n            let minutes  = Math.floor((diff / 1000 / 60) % 60);\n\n            frm.dashboard.set_headline(\n                `Working Hours: ${hours} hour(s) ${minutes} minute(s)`\n            );\n        }\n\n        // ── Lock check-in fields after first save ──\n        if (!frm.is_new() && frm.doc.time) {\n            frm.set_df_property('time',     'read_only', 1);\n            frm.set_df_property('log_type', 'read_only', 1);\n        }\n\n        // ── Lock all fields after checkout ──\n        if (!frm.is_new() && frm.doc.checkout_time) {\n            frm.set_df_property('time',         'read_only', 1);\n            frm.set_df_property('log_type',     'read_only', 1);\n            frm.set_df_property('checkout_time','read_only', 1);\n            frm.set_df_property('log_type_out', 'read_only', 1);\n        }\n\n        // ── Checkout Now Button ──\n        if (!frm.is_new() && frm.doc.time && !frm.doc.checkout_time) {\n\n            frm.add_custom_button('Checkout Now', function () {\n\n                let checkin_time = new Date(frm.doc.time);\n                let now          = new Date();\n                let diff_hours   = (now - checkin_time) / 1000 / 60 / 60;\n\n                if (diff_hours < 8) {\n\n                    let remaining_minutes = Math.ceil((8 - diff_hours) * 60);\n                    let remaining_hours   = Math.floor(remaining_minutes / 60);\n                    let remaining_mins    = remaining_minutes % 60;\n\n                    frappe.msgprint({\n                        title: 'Checkout Not Allowed Yet',\n                        message:\n                            `You can only checkout after <b>8 hours</b> from check-in.<br><br>` +\n                            `Check-in Time : <b>${frm.doc.time}</b><br>` +\n                            `Time Remaining: <b>${remaining_hours} hour(s) ${remaining_mins} minute(s)</b>`,\n                        indicator: 'red'\n                    });\n                    return;\n                }\n\n                let now_str = frappe.datetime.now_datetime();\n                frm.set_value('checkout_time', now_str);\n                frm.set_value('log_type_out',  'OUT');\n\n                frm.save().then(() => {\n                    frappe.show_alert({\n                        message: 'Checkout recorded successfully.',\n                        indicator: 'green'\n                    });\n                });\n\n            }).addClass('btn-primary');\n        }\n    },\n\n    checkout_time(frm) {\n\n        if (!frm.doc.time || !frm.doc.checkout_time) return;\n\n        let checkin  = new Date(frm.doc.time);\n        let checkout = new Date(frm.doc.checkout_time);\n\n        if (checkout <= checkin) {\n            frappe.msgprint({\n                title: 'Invalid Checkout Time',\n                message: 'Checkout Time cannot be before or equal to Check-in Time.',\n                indicator: 'red'\n            });\n            frm.set_value('checkout_time', '');\n            return;\n        }\n\n        let diff_hours = (checkout - checkin) / 1000 / 60 / 60;\n        if (diff_hours < 8) {\n            frappe.msgprint({\n                title: 'Checkout Too Early',\n                message: 'Checkout is only allowed after 8 hours from Check-in.',\n                indicator: 'orange'\n            });\n            frm.set_value('checkout_time', '');\n            return;\n        }\n    },\n\n    employee(frm) {\n\n        if (!frm.doc.employee || !frm.doc.__islocal) return;\n\n        frappe.call({\n            method: 'frappe.client.get_list',\n            args: {\n                doctype: 'Employee Checkin',\n                filters: {\n                    employee: frm.doc.employee,\n                    time: ['between', [\n                        frappe.datetime.get_today() + ' 00:00:00',\n                        frappe.datetime.get_today() + ' 23:59:59'\n                    ]]\n                },\n                fields: ['name', 'time', 'checkout_time']\n            },\n            callback: function(r) {\n\n                if (r.message && r.message.length > 0) {\n\n                    let existing = r.message[0];\n                    frm.set_value('employee', '');\n\n                    frappe.msgprint({\n                        title: 'Already Checked In Today',\n                        message:\n                            `This employee already has a check-in record for today.<br><br>` +\n                            `Check-in Time : <b>${existing.time}</b><br>` +\n                            `Checkout Time : <b>${existing.checkout_time || 'Not yet checked out'}</b><br><br>` +\n                            `<a href=\"/app/employee-checkin/${existing.name}\" target=\"_blank\">Open Existing Record</a>`,\n                        indicator: 'red'\n                    });\n                }\n            }\n        });\n    }\n\n});",
+  "view": "Form"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "Client Script",
+  "dt": "Employee Checkin",
+  "enabled": 0,
+  "modified": "2026-02-18 20:42:26.450057",
+  "module": "HR",
+  "name": "Checkin Location",
+  "script": "frappe.ui.form.on(\"Employee Checkin\", {\n    refresh(frm) {\n\n        // run only for employee checkin screen\n        if (!navigator.geolocation) {\n            frappe.msgprint(\"Location not supported by browser\");\n            return;\n        }\n\n        navigator.geolocation.getCurrentPosition(function(position) {\n\n            let lat = position.coords.latitude;\n            let lng = position.coords.longitude;\n\n            // If checkout time empty → checkin\n            if (!frm.doc.checkout_time) {\n                frm.set_value(\"latitude\", lat);\n                frm.set_value(\"longitude\", lng);\n            } \n            else {\n                frm.set_value(\"latitude_out\", lat);\n                frm.set_value(\"longitude_out\", lng);\n            }\n\n        });\n    }\n});\n",
+  "view": "Form"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "Client Script",
+  "dt": "Attendance Request",
+  "enabled": 0,
+  "modified": "2026-02-20 13:37:24.558186",
+  "module": "HR",
+  "name": "Attendance Request Name Autofill",
+  "script": "",
+  "view": "Form"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "Client Script",
+  "dt": "Employee Checkin",
+  "enabled": 1,
+  "modified": "2026-02-23 18:10:27.336930",
+  "module": "HR",
+  "name": "fetch employee name in employee checkin",
+  "script": "frappe.ui.form.on('Employee Checkin', {\n    onload: function(frm) {\n        // This sets the field to Read Only as soon as the form loads\n        frm.set_df_property('employee', 'read_only', 1);\n\n        if (frm.is_new()) {\n            // Fetch the employee linked to the logged-in user\n            frappe.db.get_value('Employee', {'user_id': frappe.session.user}, 'name', (r) => {\n                if (r && r.name) {\n                    frm.set_value('employee', r.name);\n                }\n            });\n        }\n    },\n    refresh: function(frm) {\n        // Secondary check to ensure it remains uneditable during refresh\n        frm.set_df_property('employee', 'read_only', 1);\n    }\n});",
+  "view": "Form"
+ }
+]

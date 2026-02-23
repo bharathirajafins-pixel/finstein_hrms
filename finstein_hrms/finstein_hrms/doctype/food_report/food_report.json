@@ -1,0 +1,130 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "autoname": "format:FR-{user}-{report_date}",
+ "creation": "2026-02-19 11:25:39.982666",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "user",
+  "report_date",
+  "sb_breakfast",
+  "breakfast_consumed",
+  "breakfast_remarks",
+  "sb_lunch",
+  "lunch_consumed",
+  "lunch_remarks",
+  "sb_dinner",
+  "dinner_consumed",
+  "dinner_remarks"
+ ],
+ "fields": [
+  {
+   "fieldname": "user",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "User",
+   "options": "User",
+   "reqd": 1,
+   "search_index": 1
+  },
+  {
+   "fieldname": "report_date",
+   "fieldtype": "Date",
+   "in_list_view": 1,
+   "label": "Report Date",
+   "reqd": 1
+  },
+  {
+   "fieldname": "sb_breakfast",
+   "fieldtype": "Section Break",
+   "label": "\ud83c\udf05 Breakfast"
+  },
+  {
+   "default": "1",
+   "fieldname": "breakfast_consumed",
+   "fieldtype": "Check",
+   "in_list_view": 1,
+   "label": "Breakfast Consumed"
+  },
+  {
+   "fieldname": "breakfast_remarks",
+   "fieldtype": "Small Text",
+   "label": "Breakfast Remarks"
+  },
+  {
+   "fieldname": "sb_lunch",
+   "fieldtype": "Section Break",
+   "label": "\u2600\ufe0f Lunch"
+  },
+  {
+   "default": "1",
+   "fieldname": "lunch_consumed",
+   "fieldtype": "Check",
+   "in_list_view": 1,
+   "label": "Lunch Consumed"
+  },
+  {
+   "fieldname": "lunch_remarks",
+   "fieldtype": "Small Text",
+   "label": "Lunch Remarks"
+  },
+  {
+   "fieldname": "sb_dinner",
+   "fieldtype": "Section Break",
+   "label": "\ud83c\udf19 Dinner"
+  },
+  {
+   "default": "1",
+   "fieldname": "dinner_consumed",
+   "fieldtype": "Check",
+   "in_list_view": 1,
+   "label": "Dinner Consumed"
+  },
+  {
+   "fieldname": "dinner_remarks",
+   "fieldtype": "Small Text",
+   "label": "Dinner Remarks"
+  }
+ ],
+ "grid_page_length": 50,
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2026-02-23 15:48:43.165160",
+ "modified_by": "Administrator",
+ "module": "Finstein_hrms",
+ "name": "Food Report",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "All",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "row_format": "Dynamic",
+ "rows_threshold_for_grid_search": 20,
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": [],
+ "track_changes": 1
+}

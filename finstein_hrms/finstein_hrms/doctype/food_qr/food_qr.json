@@ -1,0 +1,205 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "autoname": "format:FQR-{date}-{food_type}",
+ "creation": "2026-02-19 13:27:52.022614",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "date",
+  "day",
+  "col1",
+  "food_type",
+  "food_item",
+  "col2",
+  "status",
+  "sb_vendor",
+  "vendor",
+  "col3",
+  "serving_time",
+  "window_start",
+  "window_end",
+  "sb_counts",
+  "food_put_count",
+  "col4",
+  "consumed_count",
+  "sb_qr",
+  "qr_data",
+  "col5",
+  "qr_image_url",
+  "qr_display"
+ ],
+ "fields": [
+  {
+   "fieldname": "date",
+   "fieldtype": "Date",
+   "in_list_view": 1,
+   "label": "Date",
+   "reqd": 1,
+   "search_index": 1
+  },
+  {
+   "fieldname": "day",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Day",
+   "read_only": 1
+  },
+  {
+   "fieldname": "col1",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "food_type",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "label": "Food Type",
+   "options": "Breakfast\nLunch\nDinner",
+   "reqd": 1
+  },
+  {
+   "fieldname": "food_item",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Food Item"
+  },
+  {
+   "fieldname": "col2",
+   "fieldtype": "Column Break"
+  },
+  {
+   "default": "Scheduled",
+   "fieldname": "status",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "label": "Status",
+   "options": "Scheduled\nActive\nClosed"
+  },
+  {
+   "fieldname": "sb_vendor",
+   "fieldtype": "Section Break",
+   "label": "Vendor & Timing"
+  },
+  {
+   "description": "Frappe user assigned as food vendor for this slot",
+   "fieldname": "vendor",
+   "fieldtype": "Link",
+   "label": "Food Provider (User)",
+   "options": "User"
+  },
+  {
+   "fieldname": "col3",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "serving_time",
+   "fieldtype": "Time",
+   "label": "Serving Time"
+  },
+  {
+   "description": "Scan window opens at this time",
+   "fieldname": "window_start",
+   "fieldtype": "Time",
+   "label": "Window Start",
+   "read_only": 1
+  },
+  {
+   "description": "Scan window closes at this time",
+   "fieldname": "window_end",
+   "fieldtype": "Time",
+   "label": "Window End",
+   "read_only": 1
+  },
+  {
+   "fieldname": "sb_counts",
+   "fieldtype": "Section Break",
+   "label": "Food Counts"
+  },
+  {
+   "default": "0",
+   "description": "Live count of user orders \u2014 auto-updated when orders change",
+   "fieldname": "food_put_count",
+   "fieldtype": "Int",
+   "in_list_view": 1,
+   "label": "Food Put Count"
+  },
+  {
+   "fieldname": "col4",
+   "fieldtype": "Column Break"
+  },
+  {
+   "default": "0",
+   "description": "+1 on each employee QR scan",
+   "fieldname": "consumed_count",
+   "fieldtype": "Int",
+   "in_list_view": 1,
+   "label": "Consumed Count",
+   "read_only": 1
+  },
+  {
+   "fieldname": "sb_qr",
+   "fieldtype": "Section Break",
+   "label": "QR Code"
+  },
+  {
+   "description": "Unique string encoded in QR",
+   "fieldname": "qr_data",
+   "fieldtype": "Data",
+   "label": "QR Data",
+   "read_only": 1
+  },
+  {
+   "fieldname": "col5",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "qr_image_url",
+   "fieldtype": "Data",
+   "label": "QR Image URL",
+   "read_only": 1
+  },
+  {
+   "fieldname": "qr_display",
+   "fieldtype": "HTML",
+   "label": "QR Code Preview"
+  }
+ ],
+ "grid_page_length": 50,
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2026-02-23 15:47:45.842510",
+ "modified_by": "Administrator",
+ "module": "Finstein_hrms",
+ "name": "Food QR",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "All",
+   "share": 1
+  }
+ ],
+ "row_format": "Dynamic",
+ "rows_threshold_for_grid_search": 20,
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": [],
+ "track_changes": 1
+}
