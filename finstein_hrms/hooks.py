@@ -289,3 +289,9 @@ scheduler_events = {
         "1 22 * * *": ["finstein_hrms.scheduled_tasks.mark_dinner_not_consumed"],
     },
 }
+
+doc_events = {
+    "Leave Application": {
+        "validate": "finstein_hrms.public.py.Leave_validation.validate_leave_dates"
+    }
+}
