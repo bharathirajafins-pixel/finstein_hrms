@@ -259,6 +259,7 @@ fixtures = [
     "Notification",
     "Print Format",
     "Workspace",
+    "Web Page",
 ]
 
 doc_events = {
