@@ -3829,7 +3829,7 @@
   "depends_on": null,
   "description": null,
   "docstatus": 0,
-  "doctype": "Custom Field",
+  "doctype": "Custom Field", 
   "dt": "Employee Separation",
   "fetch_from": null,
   "fetch_if_empty": 0,
