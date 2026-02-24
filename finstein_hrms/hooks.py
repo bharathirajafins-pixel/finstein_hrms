@@ -5,6 +5,13 @@ app_description = "hrms for the our company"
 app_email = "bharathi7b650@gmail.com"
 app_license = "mit"
 
+fixtures = [
+    {"dt": "Notification", "filters": [["is_standard", "=", 0]]},
+    "Custom Field", 
+    "Property Setter",
+    # ... keep your other fixtures
+]
+
 # Apps
 # ------------------
 
@@ -281,4 +288,10 @@ scheduler_events = {
         "0 19 * * *": ["finstein_hrms.scheduled_tasks.activate_dinner_qr"],
         "1 22 * * *": ["finstein_hrms.scheduled_tasks.mark_dinner_not_consumed"],
     },
+}
+
+doc_events = {
+    "Leave Application": {
+        "validate": "finstein_hrms.public.py.Leave_validation.validate_leave_dates"
+    }
 }
