@@ -276,6 +276,12 @@ doc_events = {
     }
 }
 
+doc_events = {
+    "Attendance Request": {
+        "validate": "finstein_hrms.public.py.Attendances Request.validate"
+    }
+}
+
 scheduler_events = {
     "daily": [
         "finstein_hrms.scheduled_tasks.create_food_qr_records",
