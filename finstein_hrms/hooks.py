@@ -256,17 +256,8 @@ fixtures = [
 
 # Custom HRMS portability hooks (exported customizations + meal QR automation)
 fixtures = [
-    "Custom Field",
-    "Property Setter",
-    "Client Script",
-    "Server Script",
-    "Workflow",
-    "Workflow State",
-    "Role",
-    "Notification",
-    "Print Format",
-    "Workspace",
-    "Web Page",
+    
+    "Workspace"
 ]
 
 doc_events = {
