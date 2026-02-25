@@ -5,12 +5,6 @@ app_description = "hrms for the our company"
 app_email = "bharathi7b650@gmail.com"
 app_license = "mit"
 
-fixtures = [
-    {"dt": "Notification", "filters": [["is_standard", "=", 0]]},
-    "Custom Field", 
-    "Property Setter",
-    # ... keep your other fixtures
-]
 
 # Apps
 # ------------------
@@ -256,18 +250,8 @@ fixtures = [
 
 # Custom HRMS portability hooks (exported customizations + meal QR automation)
 fixtures = [
-    "Custom Field",
-    "Property Setter",
-    "Client Script",
-    "Server Script",
-    "Workflow",
-    "Workflow State",
-    "Role",
-    "Notification",
-    "Print Format",
-    "Workspace",
-    "Web Page",
-]
+    "Workspace"
+    ]
 
 doc_events = {
     "Food Count": {
