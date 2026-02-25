@@ -6,17 +6,7 @@ app_email = "bharathi7b650@gmail.com"
 app_license = "mit"
 
 fixtures = [
-    {
-        "doctype": "Workspace",
-        "filters": [
-            ["name", "in", [
-                "CEO Workspace",
-                "HR Workspace", 
-                "Employee Workspace",
-                "Team Leader Workspace"
-            ]]
-        ]
-    }
+    "Workspace"
 ]
 
 # Apps
@@ -262,10 +252,6 @@ fixtures = [
 # ignore_translatable_strings_from = []
 
 # Custom HRMS portability hooks (exported customizations + meal QR automation)
-fixtures = [
-    
-    "Workspace"
-]
 
 doc_events = {
     "Food Count": {
