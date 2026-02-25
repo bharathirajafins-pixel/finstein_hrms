@@ -277,6 +277,7 @@ doc_events = {
     "Leave Application": {
         "validate": "finstein_hrms.server_script.leave_validation.validate_leave_dates"
 }
+}
 
 doc_events = {
     "Attendance Request": {
