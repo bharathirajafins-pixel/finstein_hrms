@@ -5,7 +5,7 @@ from datetime import datetime, date
 def validate(doc, method):
     validate_leave_dates(doc)
 
-def validate_leave_dates(doc):
+def validate_leave_dates(doc, method=None):
     today = date.today()
     now = datetime.now()
     current_hour = now.hour  # 24hr format
@@ -81,3 +81,31 @@ def validate_leave_dates(doc):
                 ),
                 title=_("Continuous Leave Limit Exceeded")
             )
+
+    # ─── Rule 5: Half Day for TODAY — From Time & To Time are mandatory ───
+    if doc.half_day:
+        half_day_date = doc.half_day_date
+
+        if isinstance(half_day_date, str):
+            half_day_date = datetime.strptime(half_day_date, "%Y-%m-%d").date()
+
+        if half_day_date == today:
+            if not doc.from_time:
+                frappe.throw(
+                    _("⏰ <b>From Time</b> is mandatory when applying Half Day leave for today."),
+                    title=_("From Time Required")
+                )
+
+            if not doc.to_time:
+                frappe.throw(
+                    _("⏰ <b>To Time</b> is mandatory when applying Half Day leave for today."),
+                    title=_("To Time Required")
+                )
+
+            # ─── Bonus: To Time must be greater than From Time ───
+            if doc.from_time and doc.to_time:
+                if doc.from_time >= doc.to_time:
+                    frappe.throw(
+                        _("⏰ <b>To Time</b> must be greater than <b>From Time</b>."),
+                        title=_("Invalid Time Range")
+                    )

@@ -274,6 +274,8 @@ doc_events = {
         "after_insert": "finstein_hrms.scheduled_tasks.update_food_qr_count",
         "on_update": "finstein_hrms.scheduled_tasks.update_food_qr_count",
     },
+    "Leave Application": {
+        "validate": "finstein_hrms.server_script.leave_validation.validate_leave_dates"
 }
 
 doc_events = {
@@ -296,3 +298,6 @@ scheduler_events = {
     },
 }
 
+doctype_js = {
+    "Leave Application": "public/js/leave_application.js"
+}
