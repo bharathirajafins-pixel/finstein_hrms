@@ -274,14 +274,11 @@ doc_events = {
         "after_insert": "finstein_hrms.scheduled_tasks.update_food_qr_count",
         "on_update": "finstein_hrms.scheduled_tasks.update_food_qr_count",
     },
-    "Leave Application": {
-        "validate": "finstein_hrms.public.py.Leave_validation.validate_leave_dates"
-    }
 }
 
 doc_events = {
     "Attendance Request": {
-        "validate": "finstein_hrms.public.py.Attendances Request.validate"
+        "validate": "finstein_hrms.server_script.attendances_request.validate"
     }
 }
 
