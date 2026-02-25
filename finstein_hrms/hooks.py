@@ -6,10 +6,17 @@ app_email = "bharathi7b650@gmail.com"
 app_license = "mit"
 
 fixtures = [
-    {"dt": "Notification", "filters": [["is_standard", "=", 0]]},
-    "Custom Field", 
-    "Property Setter",
-    # ... keep your other fixtures
+    {
+        "doctype": "Workspace",
+        "filters": [
+            ["name", "in", [
+                "CEO Workspace",
+                "HR Workspace", 
+                "Employee Workspace",
+                "Team Leader Workspace"
+            ]]
+        ]
+    }
 ]
 
 # Apps
