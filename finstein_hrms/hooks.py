@@ -283,6 +283,6 @@ scheduler_events = {
 }
 
 doctype_js = {
-    "Employee Checkin": "public/js/employee_checkin_client.js"
+    "Employee Checkin": "public/js/employee_checkin_client.js",
     "Leave Application": "public/js/leave_application.js"
 }
