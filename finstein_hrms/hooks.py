@@ -276,7 +276,12 @@ doc_events = {
     },
     "Leave Application": {
         "validate": "finstein_hrms.public.py.Leave_validation.validate_leave_dates"
-    }
+    },
+    "Employee Checkin": {
+        "before_save": "finstein_hrms.server_script.checkin_validation.validate_checkin",
+        "after_insert": "finstein_hrms.server_script.checkin_validation.sync_attendance_from_checkin",
+        "on_update": "finstein_hrms.server_script.checkin_validation.sync_attendance_from_checkin",
+    },
 }
 
 scheduler_events = {
@@ -293,3 +298,6 @@ scheduler_events = {
     },
 }
 
+doctype_js = {
+    "Employee Checkin": "public/js/employee_checkin_client.js"
+}
