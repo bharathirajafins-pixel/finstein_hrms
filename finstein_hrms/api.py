@@ -136,6 +136,7 @@ def scan_food_qr(qr_data):
     }
 
 
+
 @frappe.whitelist(allow_guest=False)
 def get_todays_food_qr():
     """Provider webpage: returns today's 3 Food QR slots with live counts."""

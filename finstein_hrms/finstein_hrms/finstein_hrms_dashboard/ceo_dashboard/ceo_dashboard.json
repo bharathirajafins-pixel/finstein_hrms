@@ -1,0 +1,67 @@
+{
+ "cards": [
+  {
+   "card": "Total Outgoing Salary(Last month)"
+  },
+  {
+   "card": "Total Employees"
+  },
+  {
+   "card": "Employee Exits (This Year)"
+  },
+  {
+   "card": "New Hires (This Year)"
+  },
+  {
+   "card": "Expense Claim Request Pending"
+  },
+  {
+   "card": "Leave Request Pending"
+  },
+  {
+   "card": "Attendance Request Pending"
+  }
+ ],
+ "charts": [
+  {
+   "chart": "Hiring vs Attrition Count",
+   "width": "Full"
+  },
+  {
+   "chart": "Outgoing Salary",
+   "width": "Full"
+  },
+  {
+   "chart": "Monthly Leave Report",
+   "width": "Full"
+  },
+  {
+   "chart": "Employees by Age",
+   "width": "Half"
+  },
+  {
+   "chart": "Department Wise Employee Count",
+   "width": "Half"
+  },
+  {
+   "chart": "Employees by Branch",
+   "width": "Half"
+  },
+  {
+   "chart": "Designation Wise Employee Count",
+   "width": "Half"
+  }
+ ],
+ "creation": "2026-02-26 13:09:52.615028",
+ "dashboard_name": "CEO Dashboard",
+ "docstatus": 0,
+ "doctype": "Dashboard",
+ "idx": 0,
+ "is_default": 0,
+ "is_standard": 1,
+ "modified": "2026-02-26 13:19:05.627233",
+ "modified_by": "Administrator",
+ "module": "Finstein_hrms",
+ "name": "CEO Dashboard",
+ "owner": "Administrator"
+}
