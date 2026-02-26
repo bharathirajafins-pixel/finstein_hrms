@@ -269,6 +269,9 @@ doc_events = {
     "Attendance Request": {
         "validate": "finstein_hrms.server_script.attendance_request_validation.validate_attendance_request"
     },
+    "Interview": {
+        "validate": "finstein_hrms.server_script.interview_round.validate_interview_scheduling"
+    },
     "Employee Separation": {
         "on_update": "finstein_hrms.server_script.employee_separation_validation.on_update"
     }
@@ -293,10 +296,13 @@ doctype_js = {
     "Leave Application": "public/js/leave_application.js",
     "Employee Separation": "public/js/employee_separation.js",
     "Attendance Request"   : "public/js/attendance_request.js",
-    "Expense Claim"      : "public/js/expense_claim.js"
+    "Expense Claim"      : "public/js/expense_claim.js",
+    "Interview": "public/js/interview.js"
 }
 
 
 
 app_include_css = ["/assets/finstein_hrms/css/custom.css"]
 app_include_js = ["/assets/finstein_hrms/js/notification_popup.js"]
+
+
