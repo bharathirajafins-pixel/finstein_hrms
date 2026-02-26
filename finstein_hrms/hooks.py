@@ -250,7 +250,7 @@ app_license = "mit"
 
 # Custom HRMS portability hooks (exported customizations + meal QR automation)
 fixtures = [
-    "Workspace"
+    "Workspace",
     ]
 
 doc_events = {
@@ -286,3 +286,8 @@ doctype_js = {
     "Employee Checkin": "public/js/employee_checkin_client.js",
     "Leave Application": "public/js/leave_application.js"
 }
+
+
+
+app_include_css = ["/assets/finstein_hrms/css/custom.css"]
+app_include_js = ["/assets/finstein_hrms/js/notification_popup.js"]
