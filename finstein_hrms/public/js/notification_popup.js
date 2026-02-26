@@ -16,7 +16,7 @@ function initFinNotificationPopup() {
     if (window.__fin_notif_popup_init) return;
     window.__fin_notif_popup_init = true;
 
-    var STORAGE_KEY = "shown_notif_ids:" + frappe.session.user;
+    var STORAGE_KEY = "shown_notif_ids_v2:" + frappe.session.user;
 
     // ── CSS ──────────────────────────────────────────────────────────────────
     if (!document.getElementById("fin-notif-style")) {
@@ -265,7 +265,7 @@ function initFinNotificationPopup() {
     function fetchAndShow(limit, stagger) {
         frappe.call({
             method: "frappe.desk.doctype.notification_log.notification_log.get_notification_logs",
-            args: { limit: limit || 10 },
+            args: { limit: limit || 30 },
             callback: function (r) {
                 var rows = (r && r.message && r.message.notification_logs) || [];
                 renderUnshown(rows, stagger);
@@ -281,7 +281,7 @@ function initFinNotificationPopup() {
                                  "document_type", "document_name",
                                  "creation", "read", "from_user"],
                         order_by: "creation desc",
-                        limit_page_length: limit || 10
+                        limit_page_length: limit || 30
                     },
                     callback: function (rr) {
                         renderUnshown((rr && rr.message) || [], stagger);
@@ -292,10 +292,10 @@ function initFinNotificationPopup() {
     }
 
     // ── Start ─────────────────────────────────────────────────────────────────
-    fetchAndShow(15, true);
+    fetchAndShow(30, true);
 
     // poll every 8 seconds
-    setInterval(function () { fetchAndShow(5, false); }, 8000);
+    setInterval(function () { fetchAndShow(30, false); }, 6000);
 
     // when user returns to tab
     document.addEventListener("visibilitychange", function () {
@@ -304,11 +304,11 @@ function initFinNotificationPopup() {
 
     // when window gets focus
     window.addEventListener("focus", function () {
-        fetchAndShow(10, false);
+        fetchAndShow(30, false);
     });
 
     // realtime push
     frappe.realtime.on("notification", function () {
-        setTimeout(function () { fetchAndShow(5, false); }, 600);
+        setTimeout(function () { fetchAndShow(30, false); }, 400);
     });
 }
