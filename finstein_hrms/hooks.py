@@ -250,7 +250,17 @@ app_license = "mit"
 
 # Custom HRMS portability hooks (exported customizations + meal QR automation)
 fixtures = [
-    "Workspace"
+    "Workspace",
+    {
+        "doctype": "Print Format",
+        "filters": [
+            ["name", "in", [
+                "Finstein Appointment Letter",
+                "Finstein Job Offer Letter",
+                "Finstein Employee Separation"
+            ]]
+        ]
+    }
     ]
 
 doc_events = {
@@ -290,5 +300,8 @@ scheduler_events = {
 
 doctype_js = {
     "Employee Checkin": "public/js/employee_checkin_client.js",
-    "Leave Application": "public/js/leave_application.js"
+    "Leave Application": "public/js/leave_application.js",
+    "Employee Separation": "public/js/employee_separation.js",
+    "Attendance Request"   : "public/js/attendance_request.js",
+    "Expense Claim"      : "public/js/expense_claim.js"
 }
