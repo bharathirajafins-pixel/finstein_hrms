@@ -263,6 +263,9 @@ doc_events = {
     },
     "Attendance Request": {
         "validate": "finstein_hrms.server_script.attendance_request_validation.validate_attendance_request"
+    },
+    "Interview": {
+        "validate": "finstein_hrms.server_script.interview_round.validate_interview_scheduling"
     }
 }
 
