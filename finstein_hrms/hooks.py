@@ -263,6 +263,9 @@ doc_events = {
     },
     "Attendance Request": {
         "validate": "finstein_hrms.server_script.attendance_request_validation.validate_attendance_request"
+    },
+    "Employee Separation": {
+        "on_update": "finstein_hrms.server_script.employee_separation_validation.on_update"
     }
 }
 
