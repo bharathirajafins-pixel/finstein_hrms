@@ -1,0 +1,28 @@
+{
+ "cards": [
+  {
+   "card": "Total Present (This Month)"
+  },
+  {
+   "card": "Total Absent (This Month)"
+  }
+ ],
+ "charts": [
+  {
+   "chart": "Attendance Count Monthly",
+   "width": "Full"
+  }
+ ],
+ "creation": "2026-02-26 11:15:18.890834",
+ "dashboard_name": "Employee Dashboard",
+ "docstatus": 0,
+ "doctype": "Dashboard",
+ "idx": 0,
+ "is_default": 0,
+ "is_standard": 1,
+ "modified": "2026-02-26 13:30:28.167719",
+ "modified_by": "Administrator",
+ "module": "Finstein_hrms",
+ "name": "Employee Dashboard",
+ "owner": "Administrator"
+}

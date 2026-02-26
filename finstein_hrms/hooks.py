@@ -266,6 +266,12 @@ doc_events = {
         "after_insert": "finstein_hrms.server_script.checkin_validation.sync_attendance_from_checkin",
         "on_update": "finstein_hrms.server_script.checkin_validation.sync_attendance_from_checkin",
     },
+    "Attendance Request": {
+        "validate": "finstein_hrms.server_script.attendance_request_validation.validate_attendance_request"
+    },
+    "Employee Separation": {
+        "on_update": "finstein_hrms.server_script.employee_separation_validation.on_update"
+    }
 }
 
 scheduler_events = {
@@ -284,7 +290,10 @@ scheduler_events = {
 
 doctype_js = {
     "Employee Checkin": "public/js/employee_checkin_client.js",
-    "Leave Application": "public/js/leave_application.js"
+    "Leave Application": "public/js/leave_application.js",
+    "Employee Separation": "public/js/employee_separation.js",
+    "Attendance Request"   : "public/js/attendance_request.js",
+    "Expense Claim"      : "public/js/expense_claim.js"
 }
 
 
