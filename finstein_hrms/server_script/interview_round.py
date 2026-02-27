@@ -6,12 +6,13 @@ def validate_interview_scheduling(doc, method):
     """
     Validate interview scheduling with multiple checks:
     1. Scheduled date validation (cannot be past date)
-    2. Time validation (from_time and to_time) - always validate range, past-time only for today
+    2. Time validation (from_time and to_time)
     3. Prevent duplicate interviews for the same round
     4. Round order validation - enforce sequential scheduling
     5. Check previous round status before scheduling next round
 
     Note: Validations only apply to regular users (non-admin / non-System Manager)
+    Uses custom field: custom_interview_type
     """
 
     # -----------------------------------------------
@@ -28,6 +29,24 @@ def validate_interview_scheduling(doc, method):
 
     if not doc.from_time or not doc.to_time:
         frappe.throw(_("From Time and To Time are required fields."))
+
+    # Validate custom_interview_type is set
+    if not doc.custom_interview_type:
+        frappe.throw(_("Interview Type is required. Please select an Interview Type before saving."))
+
+    # Validate that the selected Interview Round belongs to the selected Interview Type
+    round_interview_type = frappe.db.get_value(
+        "Interview Round",
+        doc.interview_round,
+        "interview_type"
+    )
+    if round_interview_type and round_interview_type != doc.custom_interview_type:
+        frappe.throw(
+            _("Interview Round '{0}' does not belong to Interview Type '{1}'. "
+              "Please select a matching Interview Round.").format(
+                doc.interview_round, doc.custom_interview_type
+            )
+        )
 
     # -----------------------------------------------
     # 1️⃣ Validate Scheduled Date
@@ -73,14 +92,13 @@ def validate_interview_scheduling(doc, method):
     # -----------------------------------------------
     # 3️⃣ Prevent Duplicate Interviews Per Round
     # -----------------------------------------------
-    # Check before round order validation to give a clear, specific error early
     filters = {
         "job_applicant": doc.job_applicant,
         "interview_round": doc.interview_round,
         "docstatus": ["!=", 2]  # Exclude cancelled documents
     }
 
-    # Exclude current doc when editing (amend / save scenarios)
+    # Exclude current doc when editing
     if doc.name:
         filters["name"] = ["!=", doc.name]
 
@@ -113,8 +131,10 @@ def validate_interview_scheduling(doc, method):
     )
 
     if not round_order:
-        frappe.throw(_("Round order is not defined for Interview Round: '{0}'. "
-                       "Please configure the round order before scheduling.").format(doc.interview_round))
+        frappe.throw(
+            _("Round order is not defined for Interview Round: '{0}'. "
+              "Please configure the round order before scheduling.").format(doc.interview_round)
+        )
 
     # First round — no previous rounds to check
     if round_order == 1:
@@ -123,17 +143,22 @@ def validate_interview_scheduling(doc, method):
     # Check all previous rounds sequentially
     for prev_round_num in range(1, round_order):
 
-        # Get previous round document
+        # Get previous round name by order number
         prev_round_name = frappe.db.get_value(
             "Interview Round",
-            {"round_order": prev_round_num},
+            {
+                "round_order": prev_round_num,
+                "interview_type": doc.custom_interview_type  # Filter by same interview type
+            },
             "name"
         )
 
         if not prev_round_name:
             frappe.throw(
-                _("Interview Round with order {0} is not found in the system. "
-                  "Please ensure all rounds are configured sequentially.").format(prev_round_num)
+                _("Interview Round with order {0} under Interview Type '{1}' is not found. "
+                  "Please ensure all rounds are configured sequentially.").format(
+                    prev_round_num, doc.custom_interview_type
+                )
             )
 
         # Get previous interview for this applicant

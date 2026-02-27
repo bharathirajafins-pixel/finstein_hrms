@@ -92,3 +92,204 @@
         transform: translateX(0);
     }
 }
+
+
+
+/* -----------------------------------------------
+   FILE: your_app/public/css/custom.css
+   PURPOSE: Customize Frappe Home Page UI
+   APPLY IN: hooks.py → app_include_css
+----------------------------------------------- */
+
+/* ── Hide specific sidebar menu items ── */
+/* .standard-sidebar-item a[title="Build"],
+.standard-sidebar-item a[title="Sample"] {
+    display: none !important;
+} */
+
+/* ── Custom branding / logo area ── */
+/* .navbar-brand img {
+    height: 40px;
+} */
+
+/* ── Home page shortcut card styling ── */
+/* .widget.shortcut-widget-box {
+    border-radius: 10px;
+    border: 1px solid #e0e0e0;
+    transition: box-shadow 0.2s ease;
+}
+
+.widget.shortcut-widget-box:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+} */
+
+/* ── Section header styling ── */
+/* .widget-head .widget-title {
+    font-size: 16px;
+    font-weight: 600;
+    color: #333;
+} */
+
+/* ── Hide "Reports & Masters" section heading if needed ── */
+/* .page-main-content .widget-group-title { display: none; } */
+
+/* ── Custom background for home page ── */
+/* .layout-main-section {
+    background-color: #f9f9f9;
+} */
+
+/* ── Sidebar background color ── */
+/* .desk-sidebar {
+    background-color: #1a1a2e !important;
+} */
+
+/* .desk-sidebar .standard-sidebar-item a {
+    color: #ffffff !important;
+}
+
+.desk-sidebar .standard-sidebar-item a:hover {
+    background-color: rgba(255,255,255,0.1) !important;
+} */
+
+
+
+/* -----------------------------------------------
+   FILE: your_app/public/css/navbar_custom.css
+   PURPOSE: Customize Frappe Navbar
+   - Logo
+   - Search Bar
+   - Bell Icon / Notifications
+   - Add custom navbar items
+----------------------------------------------- */
+
+/* ══════════════════════════════════
+   1. LOGO
+══════════════════════════════════ */
+
+/* Resize logo */
+.navbar-brand img {
+    height: 38px !important;
+    width: auto !important;
+}
+
+/* Replace logo with your own image */
+/* Uncomment below and set your logo path */
+/*
+.navbar-brand img {
+    content: url('/assets/your_app/images/logo.png') !important;
+    height: 38px !important;
+}
+*/
+
+/* Hide default logo text if shown */
+.navbar-brand .navbar-home {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+
+/* ══════════════════════════════════
+   2. SEARCH BAR
+══════════════════════════════════ */
+
+/* Widen the search bar */
+.navbar .awesomplete input,
+.navbar .form-control.search-bar {
+    width: 380px !important;
+    border-radius: 20px !important;
+    background-color: #f4f4f8 !important;
+    border: 1px solid #ddd !important;
+    padding: 6px 18px !important;
+    font-size: 13px !important;
+}
+
+.navbar .awesomplete input:focus,
+.navbar .form-control.search-bar:focus {
+    background-color: #fff !important;
+    border-color: #5e64ff !important;
+    box-shadow: 0 0 0 3px rgba(94, 100, 255, 0.15) !important;
+    outline: none !important;
+}
+
+/* Search icon color */
+.navbar .search-icon {
+    color: #888 !important;
+}
+
+
+/* ══════════════════════════════════
+   3. BELL ICON / NOTIFICATIONS
+══════════════════════════════════ */
+
+/* Bell icon size and color */
+.navbar .notifications-icon svg,
+.navbar [data-doctype="Notification Log"] svg {
+    width: 20px !important;
+    height: 20px !important;
+    stroke: #5e64ff !important;
+}
+
+/* Notification badge (red dot / count) */
+.navbar .notifications-icon .badge,
+.navbar .badge-pill {
+    background-color: #ff4757 !important;
+    color: #fff !important;
+    font-size: 10px !important;
+    min-width: 16px !important;
+    height: 16px !important;
+    border-radius: 50% !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+}
+
+/* Notification dropdown panel */
+.notifications-list {
+    width: 380px !important;
+    max-height: 450px !important;
+    overflow-y: auto !important;
+    border-radius: 10px !important;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.12) !important;
+}
+
+/* Individual notification item */
+.notifications-list .notification-item {
+    padding: 10px 16px !important;
+    border-bottom: 1px solid #f0f0f0 !important;
+    font-size: 13px !important;
+}
+
+.notifications-list .notification-item:hover {
+    background-color: #f5f5ff !important;
+}
+
+/* Unread notification highlight */
+.notifications-list .notification-item.unread {
+    background-color: #eef0ff !important;
+    border-left: 3px solid #5e64ff !important;
+}
+
+
+/* ══════════════════════════════════
+   4. OVERALL NAVBAR STYLE
+══════════════════════════════════ */
+
+/* Sidebar selected item: remove fill color (Home white highlight) */
+.desk-sidebar .standard-sidebar-item.selected > a,
+.desk-sidebar .standard-sidebar-item.selected a,
+.desk-sidebar .standard-sidebar-item.active > a,
+.desk-sidebar .standard-sidebar-item.active a {
+    background: transparent !important;
+    box-shadow: none !important;
+}
+
+/* Home page only: remove sidebar background color */
+body.fin-home-page .desk-sidebar,
+body.fin-home-page .layout-side-section,
+body.fin-home-page .desk-sidebar .desk-sidebar-section,
+body.fin-home-page .desk-sidebar .standard-sidebar {
+    background: transparent !important;
+    background-color: transparent !important;
+    box-shadow: none !important;
+}

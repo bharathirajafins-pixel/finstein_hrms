@@ -134,5 +134,67 @@ function initFinNotificationPopup() {
     });
 }
 
-frappe.ready(initFinNotificationPopup);
-frappe.after_ajax(initFinNotificationPopup);
+$(document).ready(initFinNotificationPopup);
+if (frappe.after_ajax) {
+    frappe.after_ajax(initFinNotificationPopup);
+}
+
+
+// -----------------------------------------------
+// FILE: your_app/public/js/custom.js
+// PURPOSE: Customize Frappe Home Page UI behavior
+// APPLY IN: hooks.py → app_include_js
+// -----------------------------------------------
+
+function initHomeCustomizations() {
+    const route = (frappe.get_route_str && frappe.get_route_str()) || "";
+    const isHomeRoute = route === "" || route === "home" || window.location.pathname === "/app/home";
+    document.body.classList.toggle("fin-home-page", isHomeRoute);
+
+    // ── 1. Rename a sidebar menu label ──
+    // Find sidebar item by its text and rename it
+    $('.standard-sidebar-item').each(function () {
+        let link = $(this).find('a .item-name');
+        if (link.text().trim() === 'Sample') {
+            link.text('My Custom Module');
+        }
+    });
+
+    // ── 2. Hide specific sidebar items by name ──
+    $('.standard-sidebar-item').each(function () {
+        let text = $(this).find('.item-name').text().trim();
+        if (['Build', 'Sample'].includes(text)) {
+            $(this).hide();
+        }
+    });
+
+    // ── 3. Add a custom welcome banner on Home page ──
+    if (isHomeRoute) {
+        setTimeout(function () {
+            if ($("#fin-home-welcome-banner").length) return;
+            let banner = `
+                <div id="fin-home-welcome-banner" style="
+                    background: linear-gradient(135deg, #667eea, #764ba2);
+                    color: white;
+                    padding: 16px 24px;
+                    border-radius: 10px;
+                    margin-bottom: 16px;
+                    font-size: 15px;
+                ">
+                    👋 Welcome back, ${frappe.session.user_fullname || 'User'}!
+                    Today is ${frappe.datetime.get_today()}.
+                </div>
+            `;
+            $('.layout-main-section').prepend(banner);
+        }, 500);
+    }
+
+}
+
+$(document).ready(initHomeCustomizations);
+if (frappe.after_ajax) {
+    frappe.after_ajax(initHomeCustomizations);
+}
+if (frappe.router && frappe.router.on) {
+    frappe.router.on("change", initHomeCustomizations);
+}
