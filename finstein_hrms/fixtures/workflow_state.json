@@ -115,5 +115,32 @@
   "name": "Rejected",
   "style": "Danger",
   "workflow_state_name": "Rejected"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "Workflow State",
+  "icon": "",
+  "modified": "2026-02-27 16:25:38.100191",
+  "name": "Rejected by TL",
+  "style": "",
+  "workflow_state_name": "Rejected by TL"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "Workflow State",
+  "icon": "",
+  "modified": "2026-02-27 16:26:52.968219",
+  "name": "Approved by HR",
+  "style": "",
+  "workflow_state_name": "Approved by HR"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "Workflow State",
+  "icon": "",
+  "modified": "2026-02-27 16:28:04.289735",
+  "name": "Pending HR Approve",
+  "style": "",
+  "workflow_state_name": "Pending HR Approve"
  }
 ]
