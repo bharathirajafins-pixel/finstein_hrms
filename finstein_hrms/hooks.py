@@ -5,12 +5,6 @@ app_description = "hrms for the our company"
 app_email = "bharathi7b650@gmail.com"
 app_license = "mit"
 
-fixtures = [
-    {"dt": "Notification", "filters": [["is_standard", "=", 0]]},
-    "Custom Field", 
-    "Property Setter",
-    # ... keep your other fixtures
-]
 
 # Apps
 # ------------------
@@ -118,7 +112,7 @@ fixtures = [
 # ------------------
 # See frappe.core.notifications.get_notification_config
 
-# notification_config = "finstein_hrms.notifications.get_notification_config"
+notification_config = "finstein_hrms.notifications.get_config"
 
 # Permissions
 # -----------
@@ -206,6 +200,9 @@ fixtures = [
 # before_request = ["finstein_hrms.utils.before_request"]
 # after_request = ["finstein_hrms.utils.after_request"]
 
+# Extend frappe.boot with custom navbar data
+# extend_bootinfo = "finstein_hrms.boot.add_navbar_data"
+
 # Job Events
 # ----------
 # before_job = ["finstein_hrms.utils.before_job"]
@@ -256,18 +253,16 @@ fixtures = [
 
 # Custom HRMS portability hooks (exported customizations + meal QR automation)
 fixtures = [
-    "Custom Field",
-    "Property Setter",
-    "Client Script",
-    "Server Script",
-    "Workflow",
-    "Workflow State",
-    "Role",
-    "Notification",
-    "Print Format",
-    "Workspace",
-    "Web Page",
-]
+    {
+        "doctype": "Workflow"
+    },
+    {
+        "doctype": "Workflow State"
+    },
+    {
+        "doctype": "Workflow Transition"
+    }
+    ]
 
 doc_events = {
     "Food Count": {
@@ -275,7 +270,21 @@ doc_events = {
         "on_update": "finstein_hrms.scheduled_tasks.update_food_qr_count",
     },
     "Leave Application": {
-        "validate": "finstein_hrms.server_script.leave_validation.validate_leave_dates"
+        "validate": "finstein_hrms.server_script.leave_validation.validate"
+    },
+    "Employee Checkin": {
+        "before_save": "finstein_hrms.server_script.checkin_validation.validate_checkin",
+        "after_insert": "finstein_hrms.server_script.checkin_validation.sync_attendance_from_checkin",
+        "on_update": "finstein_hrms.server_script.checkin_validation.sync_attendance_from_checkin",
+    },
+    "Attendance Request": {
+        "validate": "finstein_hrms.server_script.attendance_request_validation.validate_attendance_request"
+    },
+    "Interview": {
+        "validate": "finstein_hrms.server_script.interview_round.validate_interview_scheduling"
+    },
+    "Employee Separation": {
+        "on_update": "finstein_hrms.server_script.employee_separation_validation.on_update"
     }
 }
 
@@ -294,5 +303,16 @@ scheduler_events = {
 }
 
 doctype_js = {
-    "Leave Application": "public/js/leave_application.js"
+    "Employee Checkin": "public/js/employee_checkin_client.js",
+    "Leave Application": "public/js/leave_application.js",
+    "Employee Separation": "public/js/employee_separation.js",
+    "Attendance Request"   : "public/js/attendance_request.js",
+    "Expense Claim"      : "public/js/expense_claim.js",
+    "Interview": "public/js/interview.js"
 }
+
+
+
+# Global includes: notification enhancements only
+app_include_css = ["/assets/finstein_hrms/css/notification_theme.css"]
+app_include_js = ["/assets/finstein_hrms/js/notification_popup.js"]

@@ -2,6 +2,33 @@
  {
   "docstatus": 0,
   "doctype": "Workflow State",
+  "icon": "",
+  "modified": "2026-02-26 16:31:51.851955",
+  "name": "TL Approved",
+  "style": "",
+  "workflow_state_name": "TL Approved"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "Workflow State",
+  "icon": "",
+  "modified": "2026-02-26 16:32:17.117823",
+  "name": "TL Rejected",
+  "style": "",
+  "workflow_state_name": "TL Rejected"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "Workflow State",
+  "icon": "",
+  "modified": "2026-02-26 16:33:45.075655",
+  "name": "Noted",
+  "style": "",
+  "workflow_state_name": "Noted"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "Workflow State",
   "icon": "question-sign",
   "modified": "2026-02-18 15:56:24.724973",
   "name": "Pending",
@@ -88,5 +115,32 @@
   "name": "Rejected",
   "style": "Danger",
   "workflow_state_name": "Rejected"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "Workflow State",
+  "icon": "",
+  "modified": "2026-02-27 16:25:38.100191",
+  "name": "Rejected by TL",
+  "style": "",
+  "workflow_state_name": "Rejected by TL"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "Workflow State",
+  "icon": "",
+  "modified": "2026-02-27 16:26:52.968219",
+  "name": "Approved by HR",
+  "style": "",
+  "workflow_state_name": "Approved by HR"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "Workflow State",
+  "icon": "",
+  "modified": "2026-02-27 16:28:04.289735",
+  "name": "Pending HR Approve",
+  "style": "",
+  "workflow_state_name": "Pending HR Approve"
  }
 ]

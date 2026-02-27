@@ -1,0 +1,37 @@
+/* Notification dropdown styling only (keeps default Desk layout intact) */
+.notifications-list {
+    border-radius: 10px !important;
+    border: 1px solid #e5e7eb !important;
+    box-shadow: 0 10px 28px rgba(0, 0, 0, 0.12) !important;
+    overflow: hidden !important;
+}
+
+.notifications-list .header {
+    background: #111827 !important;
+    color: #ffffff !important;
+}
+
+.notifications-list .notification-item {
+    border-bottom: 1px solid #f1f5f9 !important;
+    padding: 10px 12px !important;
+}
+
+.notifications-list .notification-item:last-child {
+    border-bottom: 0 !important;
+}
+
+.notifications-list .notification-item.unread {
+    background: #eef2ff !important;
+    border-left: 3px solid #4f46e5 !important;
+}
+
+.notifications-list .notification-item:hover {
+    background: #f8fafc !important;
+}
+
+.notifications-icon .indicator,
+.notifications-icon .badge,
+.navbar .badge-pill {
+    background: #ef4444 !important;
+    color: #ffffff !important;
+}

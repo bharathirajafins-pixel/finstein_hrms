@@ -108,4 +108,4 @@ def validate_leave_dates(doc, method=None):
                     frappe.throw(
                         _("⏰ <b>To Time</b> must be greater than <b>From Time</b>."),
                         title=_("Invalid Time Range")
-                    )
+                    )   
