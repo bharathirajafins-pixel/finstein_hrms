@@ -250,16 +250,14 @@ app_license = "mit"
 
 # Custom HRMS portability hooks (exported customizations + meal QR automation)
 fixtures = [
-    "Workspace",
     {
-        "doctype": "Print Format",
-        "filters": [
-            ["name", "in", [
-                "Finstein Appointment Letter",
-                "Finstein Job Offer Letter",
-                "Finstein Employee Separation"
-            ]]
-        ]
+        "doctype": "Workflow"
+    },
+    {
+        "doctype": "Workflow State"
+    },
+    {
+        "doctype": "Workflow Transition"
     }
     ]
 
@@ -269,7 +267,7 @@ doc_events = {
         "on_update": "finstein_hrms.scheduled_tasks.update_food_qr_count",
     },
     "Leave Application": {
-        "validate": "finstein_hrms.public.py.Leave_validation.validate_leave_dates"
+        "validate": "finstein_hrms.server_script.leave_validation.validate"
     },
     "Employee Checkin": {
         "before_save": "finstein_hrms.server_script.checkin_validation.validate_checkin",
@@ -305,3 +303,4 @@ doctype_js = {
     "Attendance Request"   : "public/js/attendance_request.js",
     "Expense Claim"      : "public/js/expense_claim.js"
 }
+

@@ -4,11 +4,27 @@
   "doctype": "Workflow",
   "document_type": "Attendance Request",
   "is_active": 1,
-  "modified": "2026-02-19 11:15:45.373596",
+  "modified": "2026-02-27 14:55:49.460731",
   "name": "Attendence Request Workflow",
   "override_status": 0,
   "send_email_alert": 0,
   "states": [
+   {
+    "allow_edit": "HR Manager",
+    "avoid_status_override": 0,
+    "doc_status": "0",
+    "is_optional_state": 0,
+    "message": null,
+    "next_action_email_template": null,
+    "parent": "Attendence Request Workflow",
+    "parentfield": "states",
+    "parenttype": "Workflow",
+    "send_email": 1,
+    "state": "Noted",
+    "update_field": null,
+    "update_value": null,
+    "workflow_builder_id": null
+   },
    {
     "allow_edit": "Employee",
     "avoid_status_override": 0,
@@ -26,9 +42,9 @@
     "workflow_builder_id": null
    },
    {
-    "allow_edit": "HR Manager",
+    "allow_edit": "Team Leader",
     "avoid_status_override": 0,
-    "doc_status": "1",
+    "doc_status": "0",
     "is_optional_state": 0,
     "message": null,
     "next_action_email_template": null,
@@ -42,7 +58,7 @@
     "workflow_builder_id": null
    },
    {
-    "allow_edit": "Employee",
+    "allow_edit": "Team Leader",
     "avoid_status_override": 0,
     "doc_status": "0",
     "is_optional_state": 0,
@@ -62,7 +78,7 @@
    {
     "action": "Approve",
     "allow_self_approval": 1,
-    "allowed": "HR Manager",
+    "allowed": "Team Leader",
     "condition": null,
     "next_state": "Approved",
     "parent": "Attendence Request Workflow",
@@ -73,9 +89,22 @@
     "workflow_builder_id": null
    },
    {
-    "action": "Reject",
+    "action": "Noted",
     "allow_self_approval": 1,
     "allowed": "HR Manager",
+    "condition": null,
+    "next_state": "Noted",
+    "parent": "Attendence Request Workflow",
+    "parentfield": "transitions",
+    "parenttype": "Workflow",
+    "send_email_to_creator": 0,
+    "state": "Approved",
+    "workflow_builder_id": null
+   },
+   {
+    "action": "Reject",
+    "allow_self_approval": 1,
+    "allowed": "Team Leader",
     "condition": null,
     "next_state": "Rejected",
     "parent": "Attendence Request Workflow",
@@ -108,7 +137,7 @@
   "doctype": "Workflow",
   "document_type": "Leave Application",
   "is_active": 1,
-  "modified": "2026-02-19 11:02:22.636262",
+  "modified": "2026-02-27 14:58:01.809208",
   "name": "Leave Application Workflow",
   "override_status": 0,
   "send_email_alert": 0,
@@ -130,9 +159,9 @@
     "workflow_builder_id": null
    },
    {
-    "allow_edit": "HR Manager",
+    "allow_edit": "Team Leader",
     "avoid_status_override": 0,
-    "doc_status": "1",
+    "doc_status": "0",
     "is_optional_state": 0,
     "message": null,
     "next_action_email_template": null,
@@ -146,7 +175,7 @@
     "workflow_builder_id": null
    },
    {
-    "allow_edit": "Employee",
+    "allow_edit": "Team Leader",
     "avoid_status_override": 0,
     "doc_status": "0",
     "is_optional_state": 0,
@@ -160,13 +189,29 @@
     "update_field": "status",
     "update_value": "Rejected",
     "workflow_builder_id": null
+   },
+   {
+    "allow_edit": "HR Manager",
+    "avoid_status_override": 0,
+    "doc_status": "0",
+    "is_optional_state": 0,
+    "message": null,
+    "next_action_email_template": null,
+    "parent": "Leave Application Workflow",
+    "parentfield": "states",
+    "parenttype": "Workflow",
+    "send_email": 1,
+    "state": "Noted",
+    "update_field": null,
+    "update_value": null,
+    "workflow_builder_id": null
    }
   ],
   "transitions": [
    {
     "action": "Approve",
     "allow_self_approval": 1,
-    "allowed": "HR Manager",
+    "allowed": "Team Leader",
     "condition": null,
     "next_state": "Approved",
     "parent": "Leave Application Workflow",
@@ -179,7 +224,7 @@
    {
     "action": "Reject",
     "allow_self_approval": 1,
-    "allowed": "HR Manager",
+    "allowed": "Team Leader",
     "condition": null,
     "next_state": "Rejected",
     "parent": "Leave Application Workflow",
@@ -200,6 +245,19 @@
     "parenttype": "Workflow",
     "send_email_to_creator": 0,
     "state": "Rejected",
+    "workflow_builder_id": null
+   },
+   {
+    "action": "Noted",
+    "allow_self_approval": 1,
+    "allowed": "HR Manager",
+    "condition": null,
+    "next_state": "Noted",
+    "parent": "Leave Application Workflow",
+    "parentfield": "transitions",
+    "parenttype": "Workflow",
+    "send_email_to_creator": 0,
+    "state": "Approved",
     "workflow_builder_id": null
    }
   ],
