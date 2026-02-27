@@ -112,7 +112,7 @@ app_license = "mit"
 # ------------------
 # See frappe.core.notifications.get_notification_config
 
-# notification_config = "finstein_hrms.notifications.get_notification_config"
+notification_config = "finstein_hrms.notifications.get_config"
 
 # Permissions
 # -----------
@@ -199,6 +199,9 @@ app_license = "mit"
 # ----------------
 # before_request = ["finstein_hrms.utils.before_request"]
 # after_request = ["finstein_hrms.utils.after_request"]
+
+# Extend frappe.boot with custom navbar data
+# extend_bootinfo = "finstein_hrms.boot.add_navbar_data"
 
 # Job Events
 # ----------
@@ -310,7 +313,6 @@ doctype_js = {
 
 
 
-app_include_css = ["/assets/finstein_hrms/css/custom.css"]
+# Global includes: notification enhancements only
+app_include_css = ["/assets/finstein_hrms/css/notification_theme.css"]
 app_include_js = ["/assets/finstein_hrms/js/notification_popup.js"]
-
-

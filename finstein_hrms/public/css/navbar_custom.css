@@ -1,0 +1,407 @@
+/* -----------------------------------------------
+   FILE: your_app/public/css/navbar_custom.css
+   FIXES:
+   - Sidebar alignment & color
+   - Navbar alignment
+   - Search bar position
+   - Bell icon badge
+   - Notification dropdown persistence
+----------------------------------------------- */
+
+/* ══════════════════════════════════
+   1. NAVBAR — Main bar
+══════════════════════════════════ */
+.navbar {
+    background-color: #1a1a2e !important;
+    border-bottom: 2px solid #5e64ff !important;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2) !important;
+    padding: 4px 16px !important;
+    min-height: 50px !important;
+    display: flex !important;
+    align-items: center !important;
+}
+
+/* ══════════════════════════════════
+   2. NAVBAR BRAND / LOGO alignment
+══════════════════════════════════ */
+.navbar-brand {
+    display: flex !important;
+    align-items: center !important;
+    padding: 0 !important;
+    margin-right: 12px !important;
+}
+
+.navbar-brand img {
+    height: 32px !important;
+    width: auto !important;
+    vertical-align: middle !important;
+}
+
+/* ══════════════════════════════════
+   3. SEARCH BAR — fix alignment
+══════════════════════════════════ */
+.navbar .input-group,
+.navbar .search-bar,
+.navbar .awesomplete {
+    display: flex !important;
+    align-items: center !important;
+}
+
+.navbar .awesomplete input,
+.navbar input[type="text"].form-control {
+    height: 34px !important;
+    border-radius: 20px !important;
+    background-color: #2d2d44 !important;
+    border: 1px solid #3d3d5c !important;
+    color: #ffffff !important;
+    padding: 4px 16px !important;
+    font-size: 13px !important;
+    line-height: 1.4 !important;
+    transition: all 0.2s ease !important;
+}
+
+.navbar .awesomplete input::placeholder,
+.navbar input[type="text"].form-control::placeholder {
+    color: #aaa !important;
+}
+
+.navbar .awesomplete input:focus,
+.navbar input[type="text"].form-control:focus {
+    background-color: #3a3a5c !important;
+    border-color: #5e64ff !important;
+    box-shadow: 0 0 0 3px rgba(94, 100, 255, 0.2) !important;
+    outline: none !important;
+    color: #fff !important;
+}
+
+/* Search icon color */
+.navbar .search-icon,
+.navbar .input-group-text {
+    background-color: transparent !important;
+    border: none !important;
+    color: #aaa !important;
+}
+
+/* ══════════════════════════════════
+   4. NAV ICONS (Bell, Help, Avatar)
+   Fix vertical alignment
+══════════════════════════════════ */
+.navbar .navbar-nav {
+    display: flex !important;
+    align-items: center !important;
+    flex-direction: row !important;
+}
+
+.navbar .nav-item {
+    display: flex !important;
+    align-items: center !important;
+}
+
+.navbar .nav-link,
+.navbar .btn-link {
+    color: #cccccc !important;
+    display: flex !important;
+    align-items: center !important;
+    padding: 4px 8px !important;
+    line-height: 1 !important;
+    transition: color 0.15s !important;
+}
+
+.navbar .nav-link:hover,
+.navbar .btn-link:hover {
+    color: #5e64ff !important;
+}
+
+/* ══════════════════════════════════
+   5. BELL ICON
+══════════════════════════════════ */
+.navbar .notifications-icon {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    position: relative !important;
+}
+
+.navbar .notifications-icon svg {
+    stroke: #a0a0ff !important;
+    width: 20px !important;
+    height: 20px !important;
+    display: block !important;
+}
+
+/* Unread badge — position fix */
+.navbar .notifications-icon .badge,
+.navbar .badge-pill {
+    position: absolute !important;
+    top: -2px !important;
+    right: -2px !important;
+    background-color: #ff4757 !important;
+    color: #fff !important;
+    font-size: 9px !important;
+    min-width: 14px !important;
+    height: 14px !important;
+    border-radius: 50% !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    padding: 0 !important;
+    border: 2px solid #1a1a2e !important;
+    /* ⭐ Keep badge visible until notifications are read */
+    opacity: 1 !important;
+    visibility: visible !important;
+}
+
+/* Only hide badge when explicitly empty */
+.navbar .notifications-icon .badge:empty {
+    display: none !important;
+}
+
+/* ══════════════════════════════════
+   6. NOTIFICATION DROPDOWN
+   Keep visible until user reads/closes
+══════════════════════════════════ */
+.notifications-list {
+    width: 380px !important;
+    max-height: 500px !important;
+    overflow-y: auto !important;
+    border-radius: 10px !important;
+    box-shadow: 0 8px 28px rgba(0, 0, 0, 0.18) !important;
+    border: 1px solid #e0e0e0 !important;
+    background: #fff !important;
+}
+
+/* Each notification item */
+.notifications-list .notification-item {
+    padding: 12px 16px !important;
+    border-bottom: 1px solid #f0f0f0 !important;
+    font-size: 13px !important;
+    cursor: pointer !important;
+    transition: background 0.15s !important;
+}
+
+.notifications-list .notification-item:hover {
+    background-color: #f5f5ff !important;
+}
+
+/* ⭐ UNREAD items — highlighted until marked read */
+.notifications-list .notification-item.unread,
+.notifications-list .notification-item[data-read="0"] {
+    background-color: #eef0ff !important;
+    border-left: 3px solid #5e64ff !important;
+    font-weight: 500 !important;
+}
+
+/* Read items — normal */
+.notifications-list .notification-item.read,
+.notifications-list .notification-item[data-read="1"] {
+    background-color: #fff !important;
+    border-left: 3px solid transparent !important;
+    font-weight: 400 !important;
+    color: #888 !important;
+}
+
+/* ══════════════════════════════════
+   7. SIDEBAR — Dark theme fixes
+══════════════════════════════════ */
+.desk-sidebar,
+.layout-side-section {
+    background-color: #1a1a2e !important;
+}
+
+/* Sidebar text */
+.desk-sidebar .standard-sidebar-item a,
+.desk-sidebar .standard-sidebar-item .item-name,
+.desk-sidebar .sidebar-group-title {
+    color: #cccccc !important;
+    font-size: 13px !important;
+}
+
+/* Sidebar item hover */
+.desk-sidebar .standard-sidebar-item a:hover,
+.desk-sidebar .standard-sidebar-item.selected a {
+    background-color: rgba(94, 100, 255, 0.15) !important;
+    color: #ffffff !important;
+    border-radius: 6px !important;
+}
+
+/* Sidebar active item */
+.desk-sidebar .standard-sidebar-item.selected {
+    background-color: rgba(94, 100, 255, 0.2) !important;
+    border-radius: 6px !important;
+}
+
+/* Sidebar group header (PUBLIC label) */
+.desk-sidebar .sidebar-group .sidebar-group-title {
+    color: #7777aa !important;
+    font-size: 11px !important;
+    font-weight: 600 !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.8px !important;
+    padding: 8px 12px 4px !important;
+}
+
+/* Sidebar icons */
+.desk-sidebar .standard-sidebar-item svg,
+.desk-sidebar .standard-sidebar-item .sidebar-item-icon {
+    stroke: #8888bb !important;
+    color: #8888bb !important;
+}
+
+.desk-sidebar .standard-sidebar-item:hover svg,
+.desk-sidebar .standard-sidebar-item.selected svg {
+    stroke: #5e64ff !important;
+    color: #5e64ff !important;
+}
+
+/* Sidebar collapse arrow */
+.desk-sidebar .drop-icon svg {
+    stroke: #7777aa !important;
+}
+
+/* ══════════════════════════════════
+   8. USER AVATAR
+══════════════════════════════════ */
+.navbar .avatar,
+.navbar .avatar-small {
+    border: 2px solid #5e64ff !important;
+    border-radius: 50% !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+}
+
+/* ══════════════════════════════════
+   9. HELP BUTTON
+══════════════════════════════════ */
+.navbar .help-links,
+.navbar .dropdown-toggle {
+    color: #cccccc !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 4px !important;
+}
+
+.navbar .help-links:hover,
+.navbar .dropdown-toggle:hover {
+    color: #5e64ff !important;
+}
+
+/* ══════════════════════════════════
+   10. CUSTOM NAVBAR ITEMS alignment fix
+══════════════════════════════════ */
+#custom-navbar-items {
+    display: flex !important;
+    align-items: center !important;
+    gap: 2px !important;
+    margin-right: 4px !important;
+}
+
+#custom-datetime {
+    display: flex !important;
+    align-items: center !important;
+    font-size: 11px !important;
+    color: #8888bb !important;
+    margin-right: 8px !important;
+    white-space: nowrap !important;
+}
+
+/* Final visual correction overrides for Desk */
+:root {
+    --fin-nav-bg: #ffffff;
+    --fin-nav-border: #e5e7eb;
+    --fin-nav-text: #1f2937;
+    --fin-nav-muted: #6b7280;
+    --fin-focus: #2563eb;
+    --fin-sidebar-bg: #0f172a;
+    --fin-sidebar-text: #e5e7eb;
+    --fin-sidebar-muted: #a5b4fc;
+}
+
+.navbar,
+.desk-navbar {
+    background: var(--fin-nav-bg) !important;
+    border-bottom: 1px solid var(--fin-nav-border) !important;
+    box-shadow: 0 1px 4px rgba(15, 23, 42, 0.06) !important;
+    min-height: 56px !important;
+}
+
+.navbar .nav-link,
+.navbar .btn-link,
+.navbar .help-links,
+.navbar .dropdown-toggle,
+.desk-navbar .nav-link,
+.desk-navbar .btn-link {
+    color: var(--fin-nav-text) !important;
+}
+
+.navbar .nav-link:hover,
+.navbar .btn-link:hover,
+.navbar .help-links:hover,
+.navbar .dropdown-toggle:hover {
+    color: var(--fin-focus) !important;
+}
+
+.navbar .search-bar,
+.navbar .awesomplete,
+.navbar .search-bar .awesomplete {
+    display: flex !important;
+    align-items: center !important;
+}
+
+.navbar .search-icon,
+.navbar .search-bar .search-icon,
+.navbar .awesomplete + .search-icon {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    width: 20px !important;
+    height: 20px !important;
+    color: var(--fin-nav-muted) !important;
+    margin-right: 8px !important;
+    vertical-align: middle !important;
+}
+
+.navbar .awesomplete input,
+.navbar .form-control.search-bar,
+.navbar input[type="search"],
+.navbar input[type="text"].form-control {
+    height: 36px !important;
+    border-radius: 18px !important;
+    border: 1px solid #d1d5db !important;
+    background: #f8fafc !important;
+    color: var(--fin-nav-text) !important;
+    padding: 6px 14px !important;
+    line-height: 1.2 !important;
+}
+
+.navbar .awesomplete input::placeholder,
+.navbar .form-control.search-bar::placeholder {
+    color: #9ca3af !important;
+}
+
+.navbar .awesomplete input:focus,
+.navbar .form-control.search-bar:focus {
+    border-color: var(--fin-focus) !important;
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15) !important;
+    background: #ffffff !important;
+}
+
+.desk-sidebar,
+.layout-side-section {
+    background: var(--fin-sidebar-bg) !important;
+}
+
+.desk-sidebar .sidebar-group .sidebar-group-title {
+    color: var(--fin-sidebar-muted) !important;
+}
+
+.desk-sidebar .standard-sidebar-item a,
+.desk-sidebar .standard-sidebar-item .item-name {
+    color: var(--fin-sidebar-text) !important;
+}
+
+.desk-sidebar .standard-sidebar-item.selected a,
+.desk-sidebar .standard-sidebar-item a:hover {
+    background: rgba(99, 102, 241, 0.2) !important;
+    color: #ffffff !important;
+}
