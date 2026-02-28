@@ -1,6 +1,6 @@
 import frappe
 import uuid
-from frappe.utils import add_days, nowdate, getdate
+from frappe.utils import nowdate, getdate
 from datetime import time
 
 # ============================================================
@@ -14,87 +14,132 @@ TIME_WINDOWS = {
     "Dinner":    {"start": time(19, 0),  "end": time(22, 0),  "serving": "19:00:00"},
 }
 
+DAY_NAMES = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
+
 
 def _get_order_count(order_date, food_type):
-    field_map = {"Breakfast": "breakfast", "Lunch": "lunch", "Dinner": "dinner"}
+    field_map = {
+        "Breakfast": "breakfast_selected",
+        "Lunch": "lunch_selected",
+        "Dinner": "dinner_selected",
+    }
     db_field  = field_map.get(food_type)
     if not db_field:
         return 0
     return frappe.db.count("Food Count", filters=[
         ["order_date", "=", order_date],
-        [db_field,    "!=", ""]
+        [db_field, "=", 1]
     ])
 
 
-# ============================================================
-# SCHEDULED: 12:01 AM — Create Food QR records for tomorrow
-# ============================================================
-def create_food_qr_records():
-    tomorrow      = add_days(nowdate(), 1)
-    tomorrow_date = getdate(tomorrow)
-    day_names     = ["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"]
-    day_name      = day_names[tomorrow_date.weekday()]
+def _build_qr_payload(target_date, day_name, food_type, food_item, put_count):
+    win = TIME_WINDOWS[food_type]
+    unique_id = uuid.uuid4().hex[:10].upper()
+    qr_data = f"FQR|{target_date}|{food_type}|{unique_id}"
+    qr_url = f"https://api.qrserver.com/v1/create-qr-code/?size=300x300&data={qr_data}"
+
+    return {
+        "date": target_date,
+        "day": day_name,
+        "food_type": food_type,
+        "food_item": food_item,
+        "serving_time": win["serving"],
+        "window_start": win["start"].strftime("%H:%M:%S"),
+        "window_end": win["end"].strftime("%H:%M:%S"),
+        "status": "Scheduled",
+        "food_put_count": put_count,
+        "consumed_count": 0,
+        "qr_data": qr_data,
+        "qr_image_url": qr_url,
+        "qr_display": (
+            f'<div style="text-align:center;padding:20px;">'
+            f'<img src="{qr_url}" style="width:240px;height:240px;'
+            f'border-radius:12px;border:3px solid #f39c12;">'
+            f'<p style="margin-top:10px;font-weight:700;font-size:16px;">'
+            f'{food_type} — {food_item}</p>'
+            f'<p style="color:#888;font-size:12px;">{day_name}, {target_date}</p>'
+            f'<p style="color:#aaa;font-size:11px;">Window: '
+            f'{win["start"].strftime("%I:%M %p")} – {win["end"].strftime("%I:%M %p")}</p>'
+            f'</div>'
+        ),
+    }
+
+
+def generate_food_qr_for_date(target_date, food_type=None, force_regenerate=False):
+    """
+    Generate Food QR for a specific date.
+    - If food_type is provided, generates/updates only that slot.
+    - If food_type is None, generates/updates all meal slots available in menu.
+    """
+    target_date = str(target_date)
+    target_day_name = DAY_NAMES[getdate(target_date).weekday()]
 
     menu_list = frappe.get_list(
         "Food Menu Item",
-        filters=[["day", "=", day_name], ["available", "=", 1]],
+        filters=[["day", "=", target_day_name], ["available", "=", 1]],
         fields=["name", "breakfast_item", "lunch_item", "dinner_item"],
-        limit=1
+        limit=1,
     )
     if not menu_list:
-        frappe.logger().warning(f"[Food QR] No menu for {day_name}")
-        return
+        frappe.throw(f"No available menu found for {target_day_name}.")
 
-    menu       = menu_list[0]
+    menu = menu_list[0]
     meal_items = {
         "Breakfast": menu.get("breakfast_item"),
-        "Lunch":     menu.get("lunch_item"),
-        "Dinner":    menu.get("dinner_item")
+        "Lunch": menu.get("lunch_item"),
+        "Dinner": menu.get("dinner_item"),
     }
 
-    for food_type, food_item in meal_items.items():
+    if food_type:
+        if food_type not in meal_items:
+            frappe.throw(f"Invalid food type: {food_type}")
+        meal_items = {food_type: meal_items.get(food_type)}
+
+    created_or_updated = []
+
+    for meal_type, food_item in meal_items.items():
         if not food_item:
             continue
-        if frappe.db.exists("Food QR", {"date": tomorrow, "food_type": food_type}):
+
+        put_count = _get_order_count(target_date, meal_type)
+        existing_name = frappe.db.get_value(
+            "Food QR", {"date": target_date, "food_type": meal_type}, "name"
+        )
+
+        # Keep existing QR unless regenerate is explicitly requested.
+        if existing_name and not force_regenerate:
+            frappe.db.set_value("Food QR", existing_name, {
+                "day": target_day_name,
+                "food_item": food_item,
+                "food_put_count": put_count,
+            })
+            created_or_updated.append(existing_name)
             continue
 
-        win       = TIME_WINDOWS[food_type]
-        put_count = _get_order_count(tomorrow, food_type)
-        unique_id = uuid.uuid4().hex[:10].upper()
-        qr_data   = f"FQR|{tomorrow}|{food_type}|{unique_id}"
-        qr_url    = f"https://api.qrserver.com/v1/create-qr-code/?size=300x300&data={qr_data}"
+        payload = _build_qr_payload(target_date, target_day_name, meal_type, food_item, put_count)
 
-        qr_doc = frappe.get_doc({
-            "doctype":        "Food QR",
-            "date":           tomorrow,
-            "day":            day_name,
-            "food_type":      food_type,
-            "food_item":      food_item,
-            "serving_time":   win["serving"],
-            "window_start":   win["start"].strftime("%H:%M:%S"),
-            "window_end":     win["end"].strftime("%H:%M:%S"),
-            "status":         "Scheduled",
-            "food_put_count": put_count,
-            "consumed_count": 0,
-            "qr_data":        qr_data,
-            "qr_image_url":   qr_url,
-            "qr_display": (
-                f'<div style="text-align:center;padding:20px;">'
-                f'<img src="{qr_url}" style="width:240px;height:240px;'
-                f'border-radius:12px;border:3px solid #f39c12;">'
-                f'<p style="margin-top:10px;font-weight:700;font-size:16px;">'
-                f'{food_type} — {food_item}</p>'
-                f'<p style="color:#888;font-size:12px;">{day_name}, {tomorrow}</p>'
-                f'<p style="color:#aaa;font-size:11px;">Window: '
-                f'{win["start"].strftime("%I:%M %p")} – {win["end"].strftime("%I:%M %p")}</p>'
-                f'</div>'
-            )
-        })
+        if existing_name:
+            frappe.db.set_value("Food QR", existing_name, payload)
+            created_or_updated.append(existing_name)
+            continue
+
+        qr_doc = frappe.get_doc({"doctype": "Food QR", **payload})
         qr_doc.insert(ignore_permissions=True)
-        frappe.logger().info(f"[Food QR] Created {food_type} | put_count={put_count}")
+        created_or_updated.append(qr_doc.name)
 
     frappe.db.commit()
-    print(f"✅ Food QR records created for {day_name} {tomorrow}")
+    return created_or_updated
+
+
+# ============================================================
+# SCHEDULED: Daily — Create Food QR records for today
+# ============================================================
+def create_food_qr_records():
+    try:
+        created = generate_food_qr_for_date(nowdate())
+        frappe.logger().info(f"[Food QR] Daily generation complete for {nowdate()} -> {created}")
+    except Exception:
+        frappe.logger().exception("[Food QR] Daily generation failed")
 
 
 # ============================================================
@@ -116,6 +161,7 @@ def update_food_qr_count(doc, method=None):
         "Food Count",
         doc.name,
         ["breakfast", "lunch", "dinner",
+         "breakfast_selected", "lunch_selected", "dinner_selected",
          "breakfast_status", "lunch_status", "dinner_status"],
         as_dict=True
     )
@@ -124,14 +170,14 @@ def update_food_qr_count(doc, method=None):
         return
 
     field_map = {
-        "Breakfast": ("breakfast", "breakfast_status"),
-        "Lunch":     ("lunch",     "lunch_status"),
-        "Dinner":    ("dinner",    "dinner_status"),
+        "Breakfast": ("breakfast_selected", "breakfast_status"),
+        "Lunch":     ("lunch_selected",     "lunch_status"),
+        "Dinner":    ("dinner_selected",    "dinner_status"),
     }
 
     status_updates = {}
 
-    for food_type, (item_field, status_field) in field_map.items():
+    for food_type, (selected_field, status_field) in field_map.items():
 
         # ── Update food_put_count in Food QR ─────────────────
         new_count = _get_order_count(order_date, food_type)
@@ -146,9 +192,9 @@ def update_food_qr_count(doc, method=None):
         if current_status == "Consumed":
             continue
 
-        # Use fresh DB value first, fall back to doc attribute
-        item_value = fresh.get(item_field, "") or getattr(doc, item_field, "") or ""
-        status_updates[status_field] = "Pending" if item_value.strip() else "Not Ordered"
+        # Use selected checkbox to decide if ordered.
+        is_selected = int(fresh.get(selected_field, 0) or getattr(doc, selected_field, 0) or 0)
+        status_updates[status_field] = "Pending" if is_selected else "Not Ordered"
 
     if status_updates:
         frappe.db.set_value("Food Count", doc.name, status_updates)
@@ -161,26 +207,26 @@ def update_food_qr_count(doc, method=None):
 # ============================================================
 def mark_breakfast_not_consumed():
     today = nowdate()
-    _mark_not_consumed(today, "breakfast", "breakfast_status")
+    _mark_not_consumed(today, "breakfast_selected", "breakfast_status")
     _close_food_qr(today, "Breakfast")
 
 def mark_lunch_not_consumed():
     today = nowdate()
-    _mark_not_consumed(today, "lunch", "lunch_status")
+    _mark_not_consumed(today, "lunch_selected", "lunch_status")
     _close_food_qr(today, "Lunch")
 
 def mark_dinner_not_consumed():
     today = nowdate()
-    _mark_not_consumed(today, "dinner", "dinner_status")
+    _mark_not_consumed(today, "dinner_selected", "dinner_status")
     _close_food_qr(today, "Dinner")
 
-def _mark_not_consumed(order_date, item_field, status_field):
+def _mark_not_consumed(order_date, selected_field, status_field):
     records = frappe.get_list(
         "Food Count",
         filters=[
-            ["order_date", "=",  order_date],
-            [item_field,   "!=", ""],
-            [status_field, "=",  "Pending"]
+            ["order_date", "=", order_date],
+            [selected_field, "=", 1],
+            [status_field, "=", "Pending"]
         ],
         fields=["name"]
     )
