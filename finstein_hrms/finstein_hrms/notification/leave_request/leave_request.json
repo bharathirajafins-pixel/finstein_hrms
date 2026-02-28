@@ -2,29 +2,27 @@
  "attach_files": "",
  "attach_print": 0,
  "channel": "System Notification",
- "condition": "doc.workflow_state in [\"Pending\", \"Pending HR Approve\", \"Approved by HR\", \"Rejected by TL\"]",
- "creation": "2026-02-26 10:40:44.972718",
+ "creation": "2026-02-27 18:04:06.538325",
  "days_in_advance": 0,
  "docstatus": 0,
  "doctype": "Notification",
- "document_type": "Attendance Request",
+ "document_type": "Leave Application",
  "enabled": 1,
  "event": "Value Change",
  "idx": 0,
  "is_standard": 1,
- "message": "<p>Attendance Request <b>{{ doc.name }}</b> for {{ doc.employee_name }} is now <b>{{ doc.workflow_state }}</b>.</p>\n<p>From: {{ doc.from_date }}<br>To: {{ doc.to_date }}<br>Reason: {{ doc.reason }}</p>",
+ "message": "<p>Leave Application <b>{{ doc.name }}</b> for {{ doc.employee_name }} moved to <b>{{ doc.workflow_state }}</b>.</p>\n<p>From: {{ doc.from_date }}<br>To: {{ doc.to_date }}</p>",
  "message_type": "HTML",
- "modified": "2026-02-26 13:04:50.307798",
+ "modified": "2026-02-27 18:04:06.538325",
  "modified_by": "Administrator",
  "module": "Finstein_hrms",
- "name": "Attendance Request Pending Your Approval",
+ "name": "Leave Request",
  "owner": "Administrator",
- "property_value": "0",
  "recipients": [
   {
    "condition": "doc.workflow_state == \"Pending\"",
-   "receiver_by_document_field": "",
-   "receiver_by_role": "Team Leader"
+   "receiver_by_document_field": "leave_approver",
+   "receiver_by_role": ""
   },
   {
    "condition": "doc.workflow_state == \"Pending HR Approve\"",
@@ -40,6 +38,6 @@
  "send_system_notification": 1,
  "send_to_all_assignees": 0,
  "set_property_after_alert": "workflow_state",
- "subject": "Attendance Request Workflow Update",
+ "subject": "Leave request approval",
  "value_changed": "workflow_state"
 }
