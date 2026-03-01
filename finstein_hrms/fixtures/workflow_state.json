@@ -142,5 +142,23 @@
   "name": "Pending HR Approve",
   "style": "",
   "workflow_state_name": "Pending HR Approve"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "Workflow State",
+  "icon": "",
+  "modified": "2026-02-28 14:56:33.704114",
+  "name": "save",
+  "style": "",
+  "workflow_state_name": "save"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "Workflow State",
+  "icon": "",
+  "modified": "2026-02-28 15:14:01.357921",
+  "name": "Rejected by HR",
+  "style": "",
+  "workflow_state_name": "Rejected by HR"
  }
 ]

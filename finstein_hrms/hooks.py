@@ -112,7 +112,7 @@ app_license = "mit"
 # ------------------
 # See frappe.core.notifications.get_notification_config
 
-notification_config = "finstein_hrms.notifications.get_config"
+# notification_config = "finstein_hrms.notifications.get_notification_config"
 
 # Permissions
 # -----------
@@ -200,9 +200,6 @@ notification_config = "finstein_hrms.notifications.get_config"
 # before_request = ["finstein_hrms.utils.before_request"]
 # after_request = ["finstein_hrms.utils.after_request"]
 
-# Extend frappe.boot with custom navbar data
-# extend_bootinfo = "finstein_hrms.boot.add_navbar_data"
-
 # Job Events
 # ----------
 # before_job = ["finstein_hrms.utils.before_job"]
@@ -253,16 +250,9 @@ notification_config = "finstein_hrms.notifications.get_config"
 
 # Custom HRMS portability hooks (exported customizations + meal QR automation)
 fixtures = [
-    {
-        "doctype": "Workflow"
-    },
-    {
-        "doctype": "Workflow State"
-    },
-    {
-        "doctype": "Workflow Transition"
-    }
-    ]
+    "Workflow",
+    "Workflow State"
+]
 
 doc_events = {
     "Food Count": {
@@ -313,6 +303,7 @@ doctype_js = {
 
 
 
-# Global includes: notification enhancements only
-app_include_css = ["/assets/finstein_hrms/css/notification_theme.css"]
+app_include_css = ["/assets/finstein_hrms/css/custom.css"]
 app_include_js = ["/assets/finstein_hrms/js/notification_popup.js"]
+
+

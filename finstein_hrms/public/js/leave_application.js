@@ -1,44 +1,43 @@
+// ════════════════════════════════════════════════════════════════
+// CLIENT SCRIPT: Leave Application - Show/Hide Time Fields
+// ════════════════════════════════════════════════════════════════
+// This script shows From Time and To Time fields only when Half Day is checked
+
 frappe.ui.form.on('Leave Application', {
-
-    onload(frm) {
+    // When form loads
+    refresh: function(frm) {
         toggle_time_fields(frm);
     },
-
-    half_day(frm) {
+    
+    // When half_day checkbox is clicked
+    half_day: function(frm) {
         toggle_time_fields(frm);
-    },
-
-    half_day_date(frm) {
-        toggle_time_fields(frm);
-    },
-
-    refresh(frm) {
-        toggle_time_fields(frm);
+        
+        // Clear time values when unchecking half_day
+        if (!frm.doc.half_day) {
+            frm.set_value('custom_from_time', null);
+            frm.set_value('custom_to_time', null);
+        }
     }
-
 });
 
+// Function to show/hide time fields
 function toggle_time_fields(frm) {
-    const today = frappe.datetime.get_today(); // "YYYY-MM-DD"
-    const is_half_day = frm.doc.half_day;
-    const half_day_date = frm.doc.half_day_date;
-
-    // ─── Show for today AND future dates ───
-    const show = is_half_day && half_day_date && (half_day_date >= today);
-
-    // ─── Show / Hide ───
-    frm.set_df_property('custom_from_time', 'hidden', !show);
-    frm.set_df_property('custom_to_time', 'hidden', !show);
-
-    // ─── Mandatory / Not Mandatory ───
-    frm.set_df_property('custom_from_time', 'reqd', show ? 1 : 0);
-    frm.set_df_property('custom_to_time', 'reqd', show ? 1 : 0);
-
-    // ─── Clear values if hidden ───
-    if (!show) {
-        frm.set_value('custom_from_time', '');
-        frm.set_value('custom_to_time', '');
+    if (frm.doc.half_day) {
+        // Show time fields when half_day is checked
+        frm.set_df_property('custom_from_time', 'hidden', 0);
+        frm.set_df_property('custom_to_time', 'hidden', 0);
+        
+        // Optional: Make them NOT mandatory (they are optional)
+        frm.set_df_property('custom_from_time', 'reqd', 0);
+        frm.set_df_property('custom_to_time', 'reqd', 0);
+    } else {
+        // Hide time fields when half_day is unchecked
+        frm.set_df_property('custom_from_time', 'hidden', 1);
+        frm.set_df_property('custom_to_time', 'hidden', 1);
     }
-
-    frm.refresh_fields(['custom_from_time', 'custom_to_time']);
+    
+    // Refresh the fields
+    frm.refresh_field('custom_from_time');
+    frm.refresh_field('custom_to_time');
 }
