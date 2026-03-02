@@ -250,8 +250,7 @@ app_license = "mit"
 
 # Custom HRMS portability hooks (exported customizations + meal QR automation)
 fixtures = [
-    "Workflow",
-    "Workflow State"
+    "Workspace"
 ]
 
 doc_events = {
