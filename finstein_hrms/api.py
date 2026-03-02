@@ -96,15 +96,15 @@ def scan_food_qr(qr_data):
 
     # 6. Check meal was ordered
     field_map = {
-        "Breakfast": ("breakfast", "breakfast_status"),
-        "Lunch":     ("lunch",     "lunch_status"),
-        "Dinner":    ("dinner",    "dinner_status"),
+        "Breakfast": ("breakfast_selected", "breakfast_status"),
+        "Lunch":     ("lunch_selected",     "lunch_status"),
+        "Dinner":    ("dinner_selected",    "dinner_status"),
     }
-    item_field, status_field = field_map[qr_food_type]
-    ordered_item   = getattr(food_count, item_field,   "")
+    selected_field, status_field = field_map[qr_food_type]
+    is_selected = int(getattr(food_count, selected_field, 0) or 0)
     current_status = getattr(food_count, status_field, "")
 
-    if not ordered_item:
+    if not is_selected:
         frappe.throw(
             f"You did not order {qr_food_type} for today. "
             f"Only ordered meals can be collected."

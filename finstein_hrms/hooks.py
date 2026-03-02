@@ -303,7 +303,15 @@ doctype_js = {
 
 
 
-app_include_css = ["/assets/finstein_hrms/css/custom.css"]
-app_include_js = ["/assets/finstein_hrms/js/notification_popup.js"]
+# Global includes: notification enhancements only
+# app_include_css = ["/assets/finstein_hrms/css/notification_theme.css"]
+# app_include_js = ["/assets/finstein_hrms/js/notification_popup.js"]
 
 
+# app_include_js = ["/assets/finstein_hrms/js/fin_notification_sidebar.js"]
+
+
+# hooks.py
+app_include_js = [
+    "assets/finstein_hrms/js/fin_notification_sidebar.js?v=1"
+]

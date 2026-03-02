@@ -11,10 +11,16 @@
   "order_date",
   "breakfast_section",
   "breakfast",
+  "breakfast_meta_column",
+  "breakfast_selected",
   "lunch_section",
   "lunch",
+  "lunch_meta_column",
+  "lunch_selected",
   "dinner_section",
-  "dinner"
+  "dinner",
+  "dinner_meta_column",
+  "dinner_selected"
  ],
  "fields": [
   {
@@ -23,6 +29,7 @@
    "in_list_view": 1,
    "label": "User",
    "options": "User",
+   "read_only": 1,
    "reqd": 1,
    "search_index": 1
   },
@@ -31,6 +38,7 @@
    "fieldtype": "Date",
    "in_list_view": 1,
    "label": "Order Date",
+   "read_only": 1,
    "reqd": 1,
    "search_index": 1
   },
@@ -40,11 +48,22 @@
    "label": "\ud83c\udf05 Breakfast"
   },
   {
+   "default": "0",
+   "fieldname": "breakfast_selected",
+   "fieldtype": "Check",
+   "label": "Select Breakfast"
+  },
+  {
    "description": "Empty = not ordered / cancelled",
    "fieldname": "breakfast",
    "fieldtype": "Data",
    "in_list_view": 1,
-   "label": "Breakfast Item"
+   "label": "Breakfast Item",
+   "read_only": 1
+  },
+  {
+   "fieldname": "breakfast_meta_column",
+   "fieldtype": "Column Break"
   },
   {
    "fieldname": "lunch_section",
@@ -52,11 +71,22 @@
    "label": "\u2600\ufe0f Lunch"
   },
   {
+   "default": "0",
+   "fieldname": "lunch_selected",
+   "fieldtype": "Check",
+   "label": "Select Lunch"
+  },
+  {
    "description": "Empty = not ordered / cancelled",
    "fieldname": "lunch",
    "fieldtype": "Data",
    "in_list_view": 1,
-   "label": "Lunch Item"
+   "label": "Lunch Item",
+   "read_only": 1
+  },
+  {
+   "fieldname": "lunch_meta_column",
+   "fieldtype": "Column Break"
   },
   {
    "fieldname": "dinner_section",
@@ -64,33 +94,34 @@
    "label": "\ud83c\udf19 Dinner"
   },
   {
+   "default": "0",
+   "fieldname": "dinner_selected",
+   "fieldtype": "Check",
+   "label": "Select Dinner"
+  },
+  {
    "description": "Empty = not ordered / cancelled",
    "fieldname": "dinner",
    "fieldtype": "Data",
    "in_list_view": 1,
-   "label": "Dinner Item"
+   "label": "Dinner Item",
+   "read_only": 1
+  },
+  {
+   "fieldname": "dinner_meta_column",
+   "fieldtype": "Column Break"
   }
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2026-02-23 15:48:59.587435",
+ "modified": "2026-03-01 02:27:08.489788",
  "modified_by": "Administrator",
  "module": "Finstein_hrms",
  "name": "Food Count",
+ "naming_rule": "Expression (old style)",
  "owner": "Administrator",
  "permissions": [
-  {
-   "create": 1,
-   "email": 1,
-   "export": 1,
-   "print": 1,
-   "read": 1,
-   "report": 1,
-   "role": "HR Manager",
-   "share": 1,
-   "write": 1
-  },
   {
    "create": 1,
    "delete": 1,
@@ -104,25 +135,27 @@
    "write": 1
   },
   {
+   "create": 1,
    "delete": 1,
    "email": 1,
    "export": 1,
-   "permlevel": 1,
+   "if_owner": 1,
    "print": 1,
    "read": 1,
    "report": 1,
-   "role": "HR Manager",
+   "role": "Employee",
    "share": 1,
    "write": 1
   },
   {
    "create": 1,
+   "delete": 1,
    "email": 1,
    "export": 1,
    "print": 1,
    "read": 1,
    "report": 1,
-   "role": "All",
+   "role": "HR Manager",
    "share": 1,
    "write": 1
   }
