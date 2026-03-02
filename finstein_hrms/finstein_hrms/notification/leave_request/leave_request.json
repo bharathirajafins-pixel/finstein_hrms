@@ -7,11 +7,11 @@
  "docstatus": 0,
  "doctype": "Notification",
  "document_type": "Leave Application",
- "enabled": 1,
+ "enabled": 0,
  "event": "Value Change",
  "idx": 0,
  "is_standard": 1,
- "message": "<p>Leave Application <b>{{ doc.name }}</b> for {{ doc.employee_name }} moved to <b>{{ doc.workflow_state }}</b>.</p>\n<p>From: {{ doc.from_date }}<br>To: {{ doc.to_date }}</p>",
+ "message": "<p>Legacy notification disabled. Workflow alerts are managed through fixtures/notification.json.</p>",
  "message_type": "HTML",
  "modified": "2026-02-27 18:04:06.538325",
  "modified_by": "Administrator",
@@ -38,6 +38,6 @@
  "send_system_notification": 1,
  "send_to_all_assignees": 0,
  "set_property_after_alert": "workflow_state",
- "subject": "Leave request approval",
+ "subject": "Legacy Leave Workflow Notification",
  "value_changed": "workflow_state"
 }

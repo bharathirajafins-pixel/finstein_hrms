@@ -124,9 +124,7 @@ function _render_buttons(frm) {
         return;
     }
 
-    _btn(frm, "Check Out", "btn-danger", () => _do_checkout(frm, false));
-    _btn(frm, "Permission Checkout", "btn-warning", () => _do_break_start(frm));
-    _btn(frm, "Force Checkout", "btn-warning", () => _do_checkout(frm, true));
+    _btn(frm, "Check Out", "btn-danger", () => _do_checkout(frm));
 }
 
 
@@ -238,46 +236,74 @@ function _do_checkin(frm) {
     });
 }
 
-function _do_checkout(frm, isForce) {
+function _do_checkout(frm, isForce = false) {
     const name = frm.doc.employee_name || frm.doc.employee;
-    const msg  = isForce
+    const totalHrs = _elapsed_hrs(frm.doc.time);
+    const breakHrs = parseFloat(frm.doc.break_hours || 0);
+    const netHrs   = parseFloat(Math.max(totalHrs - breakHrs, 0).toFixed(2));
+
+    if (!isForce && netHrs < 8) {
+        _show_early_checkout_dialog(frm, name, netHrs);
+        return;
+    }
+
+    const msg = isForce
         ? __("Force Checkout for <b>{0}</b>?<br>Status will be calculated based on worked hours.", [name])
-        : __("Confirm Check Out for <b>{0}</b>?", [name]);
+        : __("Confirm Check Out for <b>{0}</b>?<br><b>{1} hrs</b> completed.", [name, netHrs]);
 
-    frappe.confirm(msg, () => {
-        const now      = frappe.datetime.now_datetime();
-        const totalHrs = _elapsed_hrs(frm.doc.time);
-        const breakHrs = parseFloat(frm.doc.break_hours || 0);
-        const netHrs   = parseFloat(Math.max(totalHrs - breakHrs, 0).toFixed(2));
+    frappe.confirm(msg, () => _complete_checkout(frm, { isForce, netHrs }));
+}
 
-        if (!isForce && netHrs < 8) {
-            frappe.msgprint({
-                title: __("Checkout Not Allowed Yet"),
-                indicator: "orange",
-                message: __("Minimum 8 working hours required. Current: <b>{0} hrs</b>.", [netHrs])
-            });
-            return;
-        }
+function _show_early_checkout_dialog(frm, name, netHrs) {
+    const dialog = new frappe.ui.Dialog({
+        title: __("Checkout Options"),
+        fields: [
+            {
+                fieldtype: "HTML",
+                fieldname: "message",
+                options: __(
+                    "<p><b>{0}</b> has completed <b>{1} hrs</b>, which is below the required <b>8 hrs</b>.</p>" +
+                    "<p>Please choose how to continue.</p>",
+                    [name, netHrs]
+                ),
+            },
+        ],
+        primary_action_label: __("Force Checkout"),
+        primary_action() {
+            dialog.hide();
+            _complete_checkout(frm, { isForce: true, netHrs });
+        },
+    });
 
-        let status = "Absent";
-        if      (netHrs >= 8) status = "Present";
-        else if (netHrs >= 4) status = "Half Day";
+    dialog.set_secondary_action_label(__("Permission Checkout"));
+    dialog.set_secondary_action(() => {
+        dialog.hide();
+        _do_break_start(frm);
+    });
+    dialog.show();
+}
 
-        frm.set_value("checkout_time", now);
-        frm.set_value("log_type_out",  isForce ? "FORCE OUT" : "OUT");
-        _safe(frm, "checkout_type",     isForce ? "Force" : "Normal");
-        _safe(frm, "working_hours",     netHrs);
-        _safe(frm, "attendance_status", status);
+function _complete_checkout(frm, { isForce, netHrs }) {
+    const now = frappe.datetime.now_datetime();
 
-        frm.save("Save").then(() => {
-            const color = status === "Present" ? "green" : status === "Half Day" ? "orange" : "red";
-            frappe.show_alert({
-                message  : __("{0}  |  {1} hrs  |  {2}",
-                    [isForce ? "⚡ Force Checkout" : "🔴 Checked Out", netHrs, status]),
-                indicator: color
-            }, 7);
-            frm.refresh();
-        });
+    let status = "Absent";
+    if      (netHrs >= 8) status = "Present";
+    else if (netHrs >= 4) status = "Half Day";
+
+    frm.set_value("checkout_time", now);
+    frm.set_value("log_type_out",  isForce ? "FORCE OUT" : "OUT");
+    _safe(frm, "checkout_type",     isForce ? "Force" : "Normal");
+    _safe(frm, "working_hours",     netHrs);
+    _safe(frm, "attendance_status", status);
+
+    frm.save("Save").then(() => {
+        const color = status === "Present" ? "green" : status === "Half Day" ? "orange" : "red";
+        frappe.show_alert({
+            message  : __("{0}  |  {1} hrs  |  {2}",
+                [isForce ? "⚡ Force Checkout" : "🔴 Checked Out", netHrs, status]),
+            indicator: color
+        }, 7);
+        frm.refresh();
     });
 }
 
