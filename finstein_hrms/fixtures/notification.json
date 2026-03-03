@@ -15,7 +15,7 @@
   "attach_files": "",
   "days_in_advance": 0,
   "condition": "doc.workflow_state in [\"Pending\", \"Pending HR Approve\"]",
-  "set_property_after_alert": "workflow_state",
+  "set_property_after_alert": null,
   "subject": "Attendance Request requires action",
   "message_type": "HTML",
   "message": "<p>Attendance Request <b>{{ doc.name }}</b> for <b>{{ doc.employee_name }}</b> is now in <b>{{ doc.workflow_state }}</b>.</p><p><b>Period:</b> {{ doc.from_date }} to {{ doc.to_date }}<br><b>Reason:</b> {{ doc.reason or '-' }}</p><p>Please review and take the next action in the workflow.</p>",
@@ -30,7 +30,8 @@
     "receiver_by_document_field": "",
     "receiver_by_role": "HR Manager"
    }
-  ]
+  ],
+  "property_value": null
  },
  {
   "name": "Attendance Request Outcome",
@@ -42,13 +43,13 @@
   "event": "Value Change",
   "value_changed": "workflow_state",
   "channel": "Email",
-  "send_system_notification": 1,
+  "send_system_notification": 0,
   "send_to_all_assignees": 0,
   "attach_print": 0,
   "attach_files": "",
   "days_in_advance": 0,
   "condition": "doc.workflow_state in [\"Approved by HR\", \"Rejected by TL\"]",
-  "set_property_after_alert": "workflow_state",
+  "set_property_after_alert": null,
   "subject": "Attendance Request {{ doc.name }} - {{ doc.workflow_state }}",
   "message_type": "HTML",
   "message": "<p>Your Attendance Request <b>{{ doc.name }}</b> for <b>{{ doc.employee_name }}</b> has been moved to <b>{{ doc.workflow_state }}</b>.</p><p><b>Period:</b> {{ doc.from_date }} to {{ doc.to_date }}<br><b>Reason:</b> {{ doc.reason or '-' }}</p><p>Please log in to review the latest status.</p>",
@@ -58,7 +59,8 @@
     "receiver_by_document_field": "owner",
     "receiver_by_role": ""
    }
-  ]
+  ],
+  "property_value": null
  },
  {
   "name": "Leave Application Routing",
@@ -76,7 +78,7 @@
   "attach_files": "",
   "days_in_advance": 0,
   "condition": "doc.workflow_state in [\"Pending\", \"Pending HR Approve\"]",
-  "set_property_after_alert": "workflow_state",
+  "set_property_after_alert": null,
   "subject": "Leave Application requires action",
   "message_type": "HTML",
   "message": "<p>Leave Application <b>{{ doc.name }}</b> for <b>{{ doc.employee_name }}</b> is now in <b>{{ doc.workflow_state }}</b>.</p><p><b>Period:</b> {{ doc.from_date }} to {{ doc.to_date }}<br><b>Leave Type:</b> {{ doc.leave_type or '-' }}</p><p>Please review and take the next workflow action.</p>",
@@ -91,7 +93,8 @@
     "receiver_by_document_field": "",
     "receiver_by_role": "HR Manager"
    }
-  ]
+  ],
+  "property_value": null
  },
  {
   "name": "Leave Application Outcome",
@@ -102,14 +105,14 @@
   "document_type": "Leave Application",
   "event": "Value Change",
   "value_changed": "workflow_state",
-  "channel": "Email",
+  "channel": "System Notification",
   "send_system_notification": 1,
   "send_to_all_assignees": 0,
   "attach_print": 0,
   "attach_files": "",
   "days_in_advance": 0,
   "condition": "doc.workflow_state in [\"Approved by HR\", \"Rejected by TL\"]",
-  "set_property_after_alert": "workflow_state",
+  "set_property_after_alert": null,
   "subject": "Leave Application {{ doc.name }} - {{ doc.workflow_state }}",
   "message_type": "HTML",
   "message": "<p>Your Leave Application <b>{{ doc.name }}</b> has been updated to <b>{{ doc.workflow_state }}</b>.</p><p><b>Period:</b> {{ doc.from_date }} to {{ doc.to_date }}<br><b>Leave Type:</b> {{ doc.leave_type or '-' }}</p><p>Please check the application for the latest details.</p>",
@@ -119,7 +122,8 @@
     "receiver_by_document_field": "owner",
     "receiver_by_role": ""
    }
-  ]
+  ],
+  "property_value": null
  },
  {
   "name": "Expense Claim Routing",
@@ -137,7 +141,7 @@
   "attach_files": "",
   "days_in_advance": 0,
   "condition": "doc.workflow_state == \"Pending Approval\"",
-  "set_property_after_alert": "workflow_state",
+  "set_property_after_alert": null,
   "subject": "Expense Claim requires action",
   "message_type": "HTML",
   "message": "<p>Expense Claim <b>{{ doc.name }}</b> submitted by <b>{{ doc.employee_name or doc.employee }}</b> is awaiting review.</p><p><b>Total Claimed Amount:</b> {{ doc.total_claimed_amount or doc.grand_total or '-' }}</p><p>Please review the claim and complete the workflow action.</p>",
@@ -147,7 +151,8 @@
     "receiver_by_document_field": "",
     "receiver_by_role": "HR Manager"
    }
-  ]
+  ],
+  "property_value": null
  },
  {
   "name": "Expense Claim Outcome",
@@ -159,13 +164,13 @@
   "event": "Value Change",
   "value_changed": "workflow_state",
   "channel": "Email",
-  "send_system_notification": 1,
+  "send_system_notification": 0,
   "send_to_all_assignees": 0,
   "attach_print": 0,
   "attach_files": "",
   "days_in_advance": 0,
   "condition": "doc.workflow_state in [\"Approved\", \"Rejected\"]",
-  "set_property_after_alert": "workflow_state",
+  "set_property_after_alert": null,
   "subject": "Expense Claim {{ doc.name }} - {{ doc.workflow_state }}",
   "message_type": "HTML",
   "message": "<p>Your Expense Claim <b>{{ doc.name }}</b> has been updated to <b>{{ doc.workflow_state }}</b>.</p><p><b>Total Claimed Amount:</b> {{ doc.total_claimed_amount or doc.grand_total or '-' }}</p><p>Please review the claim for complete details.</p>",
@@ -175,7 +180,8 @@
     "receiver_by_document_field": "owner",
     "receiver_by_role": ""
    }
-  ]
+  ],
+  "property_value": null
  },
  {
   "name": "Employee Separation Routing",
@@ -193,7 +199,7 @@
   "attach_files": "",
   "days_in_advance": 0,
   "condition": "doc.workflow_state in [\"Pending HR Review\", \"Pending Approval\"]",
-  "set_property_after_alert": "workflow_state",
+  "set_property_after_alert": null,
   "subject": "Employee Separation requires action",
   "message_type": "HTML",
   "message": "<p>Employee Separation <b>{{ doc.name }}</b> for <b>{{ doc.employee_name }}</b> is now in <b>{{ doc.workflow_state }}</b>.</p><p><b>Separation Begins On:</b> {{ doc.separation_begins_on }}<br><b>Reason:</b> {{ doc.reason or '-' }}</p><p>Please review and take the next workflow action.</p>",
@@ -208,7 +214,8 @@
     "receiver_by_document_field": "",
     "receiver_by_role": "Head"
    }
-  ]
+  ],
+  "property_value": null
  },
  {
   "name": "Employee Separation Outcome",
@@ -220,13 +227,13 @@
   "event": "Value Change",
   "value_changed": "workflow_state",
   "channel": "Email",
-  "send_system_notification": 1,
+  "send_system_notification": 0,
   "send_to_all_assignees": 0,
   "attach_print": 0,
   "attach_files": "",
   "days_in_advance": 0,
   "condition": "doc.workflow_state in [\"Approved\", \"Rejected\"]",
-  "set_property_after_alert": "workflow_state",
+  "set_property_after_alert": null,
   "subject": "Employee Separation {{ doc.name }} - {{ doc.workflow_state }}",
   "message_type": "HTML",
   "message": "<p>Employee Separation request <b>{{ doc.name }}</b> for <b>{{ doc.employee_name }}</b> has been updated to <b>{{ doc.workflow_state }}</b>.</p><p><b>Separation Begins On:</b> {{ doc.separation_begins_on }}<br><b>Reason:</b> {{ doc.reason or '-' }}</p><p>Please review the document for the latest details.</p>",
@@ -236,7 +243,8 @@
     "receiver_by_document_field": "owner",
     "receiver_by_role": ""
    }
-  ]
+  ],
+  "property_value": null
  },
  {
   "name": "Payroll Entry Routing",
@@ -254,7 +262,7 @@
   "attach_files": "",
   "days_in_advance": 0,
   "condition": "doc.workflow_state == \"Pending Approval\"",
-  "set_property_after_alert": "workflow_state",
+  "set_property_after_alert": null,
   "subject": "Payroll Entry requires approval",
   "message_type": "HTML",
   "message": "<p>Payroll Entry <b>{{ doc.name }}</b> is ready for approval.</p><p><b>Payroll Frequency:</b> {{ doc.payroll_frequency or '-' }}<br><b>Start Date:</b> {{ doc.start_date or '-' }}<br><b>End Date:</b> {{ doc.end_date or '-' }}</p><p>Please review and complete the workflow approval.</p>",
@@ -264,7 +272,8 @@
     "receiver_by_document_field": "",
     "receiver_by_role": "Head"
    }
-  ]
+  ],
+  "property_value": null
  },
  {
   "name": "Payroll Entry Outcome",
@@ -276,13 +285,13 @@
   "event": "Value Change",
   "value_changed": "workflow_state",
   "channel": "Email",
-  "send_system_notification": 1,
+  "send_system_notification": 0,
   "send_to_all_assignees": 0,
   "attach_print": 0,
   "attach_files": "",
   "days_in_advance": 0,
   "condition": "doc.workflow_state in [\"Approved\", \"Rejected\"]",
-  "set_property_after_alert": "workflow_state",
+  "set_property_after_alert": null,
   "subject": "Payroll Entry {{ doc.name }} - {{ doc.workflow_state }}",
   "message_type": "HTML",
   "message": "<p>Payroll Entry <b>{{ doc.name }}</b> has been updated to <b>{{ doc.workflow_state }}</b>.</p><p><b>Payroll Frequency:</b> {{ doc.payroll_frequency or '-' }}<br><b>Start Date:</b> {{ doc.start_date or '-' }}<br><b>End Date:</b> {{ doc.end_date or '-' }}</p><p>Please log in to review the latest details.</p>",
@@ -292,7 +301,8 @@
     "receiver_by_document_field": "owner",
     "receiver_by_role": ""
    }
-  ]
+  ],
+  "property_value": null
  },
  {
   "name": "Job Requisition Routing",
@@ -310,7 +320,7 @@
   "attach_files": "",
   "days_in_advance": 0,
   "condition": "doc.workflow_state in [\"Pending HR Review\", \"Pending Head Approval\"]",
-  "set_property_after_alert": "workflow_state",
+  "set_property_after_alert": null,
   "subject": "Job Requisition requires action",
   "message_type": "HTML",
   "message": "<p>Job Requisition <b>{{ doc.name }}</b> is now in <b>{{ doc.workflow_state }}</b>.</p><p><b>Designation:</b> {{ doc.designation or '-' }}<br><b>Department:</b> {{ doc.department or '-' }}<br><b>Company:</b> {{ doc.company or '-' }}</p><p>Please review and take the next workflow action.</p>",
@@ -325,7 +335,8 @@
     "receiver_by_document_field": "",
     "receiver_by_role": "Head"
    }
-  ]
+  ],
+  "property_value": null
  },
  {
   "name": "Job Requisition Outcome",
@@ -337,13 +348,13 @@
   "event": "Value Change",
   "value_changed": "workflow_state",
   "channel": "Email",
-  "send_system_notification": 1,
+  "send_system_notification": 0,
   "send_to_all_assignees": 0,
   "attach_print": 0,
   "attach_files": "",
   "days_in_advance": 0,
   "condition": "doc.workflow_state in [\"Approved\", \"Rejected\"]",
-  "set_property_after_alert": "workflow_state",
+  "set_property_after_alert": null,
   "subject": "Job Requisition {{ doc.name }} - {{ doc.workflow_state }}",
   "message_type": "HTML",
   "message": "<p>Job Requisition <b>{{ doc.name }}</b> has been updated to <b>{{ doc.workflow_state }}</b>.</p><p><b>Designation:</b> {{ doc.designation or '-' }}<br><b>Department:</b> {{ doc.department or '-' }}<br><b>Company:</b> {{ doc.company or '-' }}</p><p>Please review the record for complete details.</p>",
@@ -353,6 +364,7 @@
     "receiver_by_document_field": "owner",
     "receiver_by_role": ""
    }
-  ]
+  ],
+  "property_value": null
  }
 ]

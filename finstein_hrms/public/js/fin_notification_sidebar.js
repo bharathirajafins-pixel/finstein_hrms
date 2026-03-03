@@ -240,7 +240,7 @@ function initFinNotificationSidebar() {
         $("body").append(`
             <div id="fin-notif-sidebar">
                 <div class="fin-notif-header">
-                    <span class="fin-notif-header-title">Notifications</span>
+                    <span class="fin-notif-header-title">Notification</span>
                     <span class="fin-notif-badge" id="fin-notif-badge" data-count="0">0</span>
                 </div>
                 <div class="fin-notif-list" id="fin-notif-list"></div>
@@ -260,6 +260,29 @@ function initFinNotificationSidebar() {
             .replace(/&/g, "&amp;")
             .replace(/</g, "&lt;")
             .replace(/>/g, "&gt;");
+    }
+
+    function resolveNotificationRoute(n) {
+        if (n.document_type && n.document_name) {
+            return ["Form", n.document_type, n.document_name];
+        }
+
+        if (n.link) {
+            var cleanLink = String(n.link).replace(/^https?:\/\/[^/]+/i, "");
+            var match =
+                cleanLink.match(/\/app\/form\/([^/]+)\/([^/?#]+)/i) ||
+                cleanLink.match(/\/app\/([^/]+)\/([^/?#]+)/i);
+
+            if (match) {
+                return [
+                    "Form",
+                    decodeURIComponent(match[1]).replace(/-/g, " ").replace(/\b\w/g, function (c) { return c.toUpperCase(); }),
+                    decodeURIComponent(match[2]),
+                ];
+            }
+        }
+
+        return null;
     }
 
     function timeAgo(dateStr) {
@@ -323,15 +346,17 @@ function initFinNotificationSidebar() {
             `);
 
             $item.on("click", function () {
-                if (n.document_type && n.document_name) {
-                    frappe.set_route("Form", n.document_type, n.document_name);
+                var route = resolveNotificationRoute(n);
+
+                if (route) {
+                    frappe.set_route.apply(frappe, route);
                 } else {
                     frappe.set_route("Form", "Notification Log", n.name);
                 }
 
                 frappe.call({
-                    method: "frappe.client.set_value",
-                    args: { doctype: "Notification Log", name: n.name, fieldname: "read", value: 1 },
+                    method: "frappe.desk.doctype.notification_log.notification_log.mark_as_read",
+                    args: { docname: n.name },
                     callback: function () {
                         $item.slideUp(180, function () {
                             $item.remove();
@@ -357,7 +382,7 @@ function initFinNotificationSidebar() {
             args: {
                 doctype: "Notification Log",
                 filters: { for_user: frappe.session.user, read: 0 },
-                fields: ["name", "subject", "document_type", "document_name", "creation"],
+                fields: ["name", "subject", "document_type", "document_name", "link", "creation"],
                 order_by: "creation desc",
                 limit_page_length: 50
             },
@@ -386,8 +411,8 @@ function initFinNotificationSidebar() {
                 var done = 0;
                 unread.forEach(function (n) {
                     frappe.call({
-                        method: "frappe.client.set_value",
-                        args: { doctype: "Notification Log", name: n.name, fieldname: "read", value: 1 },
+                        method: "frappe.desk.doctype.notification_log.notification_log.mark_as_read",
+                        args: { docname: n.name },
                         callback: function () {
                             done++;
                             if (done === unread.length) fetchNotifications(false);

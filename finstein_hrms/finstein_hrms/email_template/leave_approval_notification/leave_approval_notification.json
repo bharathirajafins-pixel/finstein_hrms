@@ -1,0 +1,16 @@
+{
+ "creation": "2026-03-03 16:00:00.000000",
+ "docstatus": 0,
+ "doctype": "Email Template",
+ "idx": 0,
+ "is_standard": 1,
+ "modified": "2026-03-03 16:00:00.000000",
+ "modified_by": "Administrator",
+ "module": "Finstein_hrms",
+ "name": "Leave Approval Notification",
+ "owner": "Administrator",
+ "response": null,
+ "response_html": "<div style=\"font-family: Arial, sans-serif; color: #1f2937; line-height: 1.6;\"><p>Dear Approver,</p><p>A leave application requires your review.</p><table style=\"border-collapse: collapse; margin: 16px 0;\"><tr><td style=\"padding: 6px 12px 6px 0;\"><b>Application</b></td><td>{{ name }}</td></tr><tr><td style=\"padding: 6px 12px 6px 0;\"><b>Employee</b></td><td>{{ employee_name }}</td></tr><tr><td style=\"padding: 6px 12px 6px 0;\"><b>Leave Type</b></td><td>{{ leave_type or '-' }}</td></tr><tr><td style=\"padding: 6px 12px 6px 0;\"><b>Period</b></td><td>{{ from_date }} to {{ to_date }}</td></tr><tr><td style=\"padding: 6px 12px 6px 0;\"><b>Reason</b></td><td>{{ description or '-' }}</td></tr></table><p>Please review the request and complete the required workflow action in the system.</p><p>Regards,<br>HRMS</p></div>",
+ "subject": "Leave Approval Required - {{ employee_name }} ({{ name }})",
+ "use_html": 1
+}

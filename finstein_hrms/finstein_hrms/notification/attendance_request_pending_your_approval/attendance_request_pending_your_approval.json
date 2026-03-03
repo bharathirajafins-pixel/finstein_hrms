@@ -19,7 +19,7 @@
  "module": "Finstein_hrms",
  "name": "Attendance Request Pending Your Approval",
  "owner": "Administrator",
- "property_value": "0",
+ "property_value": null,
  "recipients": [
   {
    "condition": "doc.workflow_state == \"Pending\"",
@@ -39,7 +39,7 @@
  ],
  "send_system_notification": 1,
  "send_to_all_assignees": 0,
- "set_property_after_alert": "workflow_state",
+ "set_property_after_alert": null,
  "subject": "Legacy Attendance Workflow Notification",
  "value_changed": "workflow_state"
 }
