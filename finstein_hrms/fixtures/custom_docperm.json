@@ -4318,5 +4318,29 @@
   "share": 0,
   "submit": 0,
   "write": 0
+ },
+ {
+  "amend": 0,
+  "cancel": 0,
+  "create": 1,
+  "delete": 0,
+  "docstatus": 0,
+  "doctype": "Custom DocPerm",
+  "email": 0,
+  "export": 1,
+  "if_owner": 0,
+  "import": 0,
+  "modified": "2026-03-03 15:48:01.286293",
+  "name": "5btv7f26ko",
+  "parent": "Notification Log",
+  "permlevel": 0,
+  "print": 0,
+  "read": 1,
+  "report": 0,
+  "role": "Head",
+  "select": 1,
+  "share": 0,
+  "submit": 0,
+  "write": 1
  }
 ]

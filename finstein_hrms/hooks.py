@@ -252,12 +252,6 @@ app_license = "mit"
 fixtures = [
     {
         "doctype": "Custom DocPerm"
-    },
-    {
-        "doctype": "Workflow",
-        "filters": [
-            ["document_type", "=", "Leave Application"]
-        ]
     }
 ]
 
@@ -267,7 +261,23 @@ doc_events = {
         "on_update": "finstein_hrms.scheduled_tasks.update_food_qr_count",
     },
     "Leave Application": {
-        "validate": "finstein_hrms.server_script.leave_validation.validate"
+        "validate": "finstein_hrms.server_script.leave_validation.validate_leave_dates",
+        "after_insert": [
+            "finstein_hrms.leave_whatsapp.on_leave_status_change",
+            "finstein_hrms.leave_whatsapp.debug_leave",
+        ],
+        "on_update": [
+            "finstein_hrms.leave_whatsapp.on_leave_status_change",
+            "finstein_hrms.leave_whatsapp.debug_leave",
+        ],
+        "on_submit": [
+            "finstein_hrms.leave_whatsapp.on_leave_status_change",
+            "finstein_hrms.leave_whatsapp.debug_leave",
+        ],
+        "on_update_after_submit": [
+            "finstein_hrms.leave_whatsapp.on_leave_status_change",
+            "finstein_hrms.leave_whatsapp.debug_leave",
+        ],
     },
     "Employee Checkin": {
         "before_save": "finstein_hrms.server_script.checkin_validation.validate_checkin",
@@ -284,7 +294,6 @@ doc_events = {
         "on_update": "finstein_hrms.server_script.employee_separation_validation.on_update"
     }
 }
-
 scheduler_events = {
     "daily": [
         "finstein_hrms.scheduled_tasks.create_food_qr_records",
