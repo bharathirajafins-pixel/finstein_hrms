@@ -23,7 +23,19 @@ fixtures = [
             ],
         ]],
     },
-    {"doctype": "Workspace", "filters": [["module", "=", "Finstein HRMS"]]},
+    {
+        "doctype": "Workspace",
+        "filters": [[
+            "name",
+            "in",
+            [
+                "CEO",
+                "Employee Workspace",
+                "HR Workspace",
+                "TL Workspace",
+            ],
+        ]],
+    },
     {"doctype": "Finstein HRMS Settings"},
 ]
 
