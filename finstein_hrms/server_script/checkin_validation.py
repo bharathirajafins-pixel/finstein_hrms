@@ -13,6 +13,7 @@ def validate_checkin(doc, method=None):
     """Validate employee check-in sequencing and policy rules."""
     settings = get_settings()
 
+    _restrict_administrator_checkin()
     _mandatory(doc)
     _no_duplicate(doc)
     _ensure_checkout_has_checkin(doc)
@@ -139,6 +140,27 @@ def _mandatory(doc):
         frappe.throw(_("Employee is mandatory."))
     if not doc.time:
         frappe.throw(_("Check-In Time is mandatory."))
+
+
+def _restrict_administrator_checkin():
+    """
+    Restrict self check-in / check-out actions to employee users.
+    Admin and HR roles should not manually create or update these records.
+    """
+    if frappe.flags.in_install or frappe.flags.in_migrate or frappe.flags.in_patch:
+        return
+
+    roles = set(frappe.get_roles() or [])
+    restricted_roles = {"System Manager", "HR Manager", "HR User", "Head"}
+
+    if frappe.session.user == "Administrator" or roles.intersection(restricted_roles):
+        frappe.throw(
+            _(
+                "Employee Checkin can only be created through the employee Check In / "
+                "Check Out flow. Administrator and HR roles cannot create or update "
+                "check-in records manually."
+            )
+        )
 
 
 def _no_duplicate(doc):

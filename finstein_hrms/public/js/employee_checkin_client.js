@@ -6,6 +6,7 @@ frappe.ui.form.on("Employee Checkin", {
 
     onload(frm) {
         if (frm.is_new()) {
+            _prepare_new_checkin_form(frm);
             // Check if employee already has a record today — redirect if yes
             _check_existing_today(frm);
         }
@@ -105,6 +106,12 @@ function _check_existing_today(frm) {
 function _render_buttons(frm) {
     const doc          = frm.doc;
     const onBreak      = doc.break_start && !doc.break_end;
+
+    if (!_can_use_self_checkin()) {
+        frm.dashboard.add_comment(__("Self check-in is available only for employee users."), "orange");
+        frm.set_read_only();
+        return;
+    }
 
     if (doc.checkout_time) {
         // Complete — lock
@@ -389,4 +396,39 @@ function _clear_our_buttons(frm) {
         " Force Check In ",
         "⚡  Force Checkout",
     ].forEach((label) => frm.remove_custom_button(__(label)));
+}
+
+function _prepare_new_checkin_form(frm) {
+    if (frm.__new_checkin_prepared) return;
+
+    [
+        "time",
+        "log_type",
+        "checkout_time",
+        "log_type_out",
+        "break_start",
+        "break_end",
+        "break_hours",
+        "working_hours",
+        "attendance_status",
+        "checkout_type",
+    ].forEach((fieldname) => {
+        if (fieldname in frm.doc) {
+            frm.doc[fieldname] = null;
+        }
+    });
+
+    frm.__new_checkin_prepared = true;
+    frm.refresh_fields();
+}
+
+function _can_use_self_checkin() {
+    if (!frappe.user.has_role("Employee")) return false;
+
+    return ![
+        "System Manager",
+        "HR Manager",
+        "HR User",
+        "Head",
+    ].some((role) => frappe.user.has_role(role));
 }

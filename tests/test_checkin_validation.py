@@ -31,7 +31,8 @@ class TestCheckinValidation(FrappeTestCase):
 
     @patch("finstein_hrms.server_script.checkin_validation.get_settings")
     @patch("frappe.db.exists", return_value=True)
-    def test_duplicate_checkin_blocked(self, mock_exists, mock_settings):
+    @patch("frappe.get_roles", return_value=["Employee"])
+    def test_duplicate_checkin_blocked(self, mock_roles, mock_exists, mock_settings):
         mock_settings.return_value = self._make_settings()
         from finstein_hrms.server_script.checkin_validation import validate_checkin
 
@@ -41,7 +42,8 @@ class TestCheckinValidation(FrappeTestCase):
 
     @patch("finstein_hrms.server_script.checkin_validation.get_settings")
     @patch("frappe.db.exists", return_value=False)
-    def test_valid_checkin_passes(self, mock_exists, mock_settings):
+    @patch("frappe.get_roles", return_value=["Employee"])
+    def test_valid_checkin_passes(self, mock_roles, mock_exists, mock_settings):
         mock_settings.return_value = self._make_settings()
         from finstein_hrms.server_script.checkin_validation import validate_checkin
 
@@ -54,10 +56,23 @@ class TestCheckinValidation(FrappeTestCase):
     @patch("finstein_hrms.server_script.checkin_validation.get_settings")
     @patch("frappe.db.exists", return_value=False)
     @patch("frappe.db.get_value", return_value=None)
-    def test_checkout_without_checkin_blocked(self, mock_get, mock_exists, mock_settings):
+    @patch("frappe.get_roles", return_value=["Employee"])
+    def test_checkout_without_checkin_blocked(
+        self, mock_roles, mock_get, mock_exists, mock_settings
+    ):
         mock_settings.return_value = self._make_settings()
         from finstein_hrms.server_script.checkin_validation import validate_checkin
 
         doc = self._make_doc(log_type="OUT")
+        with self.assertRaises(frappe.exceptions.ValidationError):
+            validate_checkin(doc, None)
+
+    @patch("finstein_hrms.server_script.checkin_validation.get_settings")
+    @patch("frappe.get_roles", return_value=["System Manager"])
+    def test_admin_checkin_blocked(self, mock_roles, mock_settings):
+        mock_settings.return_value = self._make_settings()
+        from finstein_hrms.server_script.checkin_validation import validate_checkin
+
+        doc = self._make_doc(log_type="IN")
         with self.assertRaises(frappe.exceptions.ValidationError):
             validate_checkin(doc, None)
