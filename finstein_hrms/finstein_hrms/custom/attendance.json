@@ -1,5 +1,47 @@
 {
- "custom_fields": [],
+ "custom_fields": [
+  {
+   "doctype": "Custom Field",
+   "dt": "Attendance",
+   "fieldname": "custom_late_entry",
+   "fieldtype": "Check",
+   "insert_after": "status",
+   "label": "Late Entry",
+   "is_system_generated": 1,
+   "name": "Attendance-custom_late_entry"
+  },
+  {
+   "doctype": "Custom Field",
+   "dt": "Attendance",
+   "fieldname": "custom_early_exit",
+   "fieldtype": "Check",
+   "insert_after": "custom_late_entry",
+   "label": "Early Exit",
+   "is_system_generated": 1,
+   "name": "Attendance-custom_early_exit"
+  },
+  {
+   "doctype": "Custom Field",
+   "dt": "Attendance",
+   "fieldname": "custom_overtime_hours",
+   "fieldtype": "Float",
+   "insert_after": "custom_early_exit",
+   "label": "Overtime Hours",
+   "precision": "2",
+   "is_system_generated": 1,
+   "name": "Attendance-custom_overtime_hours"
+  },
+  {
+   "doctype": "Custom Field",
+   "dt": "Attendance",
+   "fieldname": "custom_locked",
+   "fieldtype": "Check",
+   "insert_after": "custom_overtime_hours",
+   "label": "Attendance Locked",
+   "is_system_generated": 1,
+   "name": "Attendance-custom_locked"
+  }
+ ],
  "custom_perms": [],
  "doctype": "Attendance",
  "links": [],

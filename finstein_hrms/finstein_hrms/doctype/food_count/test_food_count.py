@@ -16,6 +16,14 @@ class TestFoodCount(FrappeTestCase):
         cls.day_name = getdate(cls.order_date).strftime("%A")
         cls._ensure_menu_for_day()
 
+    def setUp(self):
+        super().setUp()
+        self._delete_food_counts_for_test_user()
+
+    def tearDown(self):
+        self._delete_food_counts_for_test_user()
+        super().tearDown()
+
     @classmethod
     def _ensure_menu_for_day(cls):
         existing = frappe.db.get_value("Food Menu Item", {"day": cls.day_name}, "name")
@@ -34,13 +42,28 @@ class TestFoodCount(FrappeTestCase):
             }
         ).insert(ignore_permissions=True).name
 
+    def _delete_food_counts_for_test_user(self):
+        records = frappe.get_all(
+            "Food Count",
+            filters={"user": frappe.session.user, "order_date": self.order_date},
+            pluck="name",
+        )
+        for name in records:
+            frappe.delete_doc("Food Count", name, force=1)
+
     def test_get_menu_for_date_returns_expected_items(self):
         menu = get_menu_for_date(self.order_date)
+        expected = frappe.db.get_value(
+            "Food Menu Item",
+            self.menu_name,
+            ["breakfast_item", "lunch_item", "dinner_item"],
+            as_dict=True,
+        )
 
         self.assertEqual(menu["day"], self.day_name)
-        self.assertEqual(menu["breakfast_item"], "Idli")
-        self.assertEqual(menu["lunch_item"], "Meals")
-        self.assertEqual(menu["dinner_item"], "Chapati")
+        self.assertEqual(menu["breakfast_item"], expected.breakfast_item)
+        self.assertEqual(menu["lunch_item"], expected.lunch_item)
+        self.assertEqual(menu["dinner_item"], expected.dinner_item)
 
     def test_validate_sets_default_user_date_and_meal_items(self):
         doc = frappe.get_doc(
@@ -54,9 +77,15 @@ class TestFoodCount(FrappeTestCase):
 
         current_user = frappe.session.user
         doc.insert(ignore_permissions=True)
+        expected = frappe.db.get_value(
+            "Food Menu Item",
+            self.menu_name,
+            ["breakfast_item", "lunch_item", "dinner_item"],
+            as_dict=True,
+        )
 
         self.assertEqual(doc.user, current_user)
         self.assertEqual(str(doc.order_date), self.order_date)
-        self.assertEqual(doc.breakfast, "Idli")
-        self.assertEqual(doc.lunch, "Meals")
-        self.assertEqual(doc.dinner, "Chapati")
+        self.assertEqual(doc.breakfast, expected.breakfast_item)
+        self.assertEqual(doc.lunch, expected.lunch_item)
+        self.assertEqual(doc.dinner, expected.dinner_item)

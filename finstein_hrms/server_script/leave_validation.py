@@ -1,95 +1,111 @@
 import frappe
-from frappe import _
-from datetime import datetime, date
+from frappe.utils import date_diff, getdate, get_time, nowtime, today
 
-def validate(doc, method):
-    validate_leave_dates(doc)
+from finstein_hrms.finstein_hrms.doctype.finstein_hrms_settings.finstein_hrms_settings import (
+    get_settings,
+)
+
+
+def validate(doc, method=None):
+    """Bridge validate hook for Leave Application."""
+    validate_leave_dates(doc, method)
+
 
 def validate_leave_dates(doc, method=None):
-    today = date.today()
-    now = datetime.now()
-    current_hour = now.hour  # 24hr format
+    """Validate leave application against company HR policy."""
+    settings = get_settings()
+    max_days = settings.max_continuous_leave_days or 3
+    cutoff = settings.leave_submission_cutoff_time or "17:00:00"
+    half_cut = settings.half_day_cutoff_time or "12:00:00"
+    allow_past = settings.allow_past_date_leave or 0
 
-    from_date = doc.from_date
-    to_date = doc.to_date
+    from_date = getdate(doc.from_date)
+    to_date = getdate(doc.to_date)
+    current_date = getdate(today())
 
-    if isinstance(from_date, str):
-        from_date = datetime.strptime(from_date, "%Y-%m-%d").date()
-    if isinstance(to_date, str):
-        to_date = datetime.strptime(to_date, "%Y-%m-%d").date()
+    if from_date > to_date:
+        frappe.throw("From Date cannot be after To Date.")
 
-    # ─── Rule 1: No past dates allowed ───
-    if from_date < today:
+    if not allow_past and (from_date < current_date or to_date < current_date):
         frappe.throw(
-            _("❌ Past date leave is not allowed. You can only apply for today or future dates."),
-            title=_("Invalid Leave Date")
+            "Past date leave is not allowed. Please select today or a future date."
         )
 
-    if to_date < today:
+    if not doc.half_day and from_date == current_date and nowtime() >= str(cutoff):
         frappe.throw(
-            _("❌ To Date cannot be a past date. Please select today or a future date."),
-            title=_("Invalid Leave Date")
+            "Full-day leave for today can only be applied before "
+            f"{cutoff}. Please apply for a future date."
         )
 
-    # ─── Rule 2: Full Day leave for TODAY must be before 10:00 AM ───
-    if not doc.half_day and from_date == today:
-        if current_hour >= 10:
-            frappe.throw(
-                _(
-                    "⏰ Full Day leave for today must be applied before <b>10:00 AM</b>. "
-                    "Current time is {0}. Please apply for a future date."
-                ).format(now.strftime("%I:%M %p")),
-                title=_("Leave Application Time Restriction")
-            )
-
-    # ─── Rule 3: Half Day leave for TODAY must be before 1:00 PM ───
     if doc.half_day:
-        half_day_date = doc.half_day_date
+        half_day_date = getdate(doc.half_day_date or doc.from_date)
 
-        if isinstance(half_day_date, str):
-            half_day_date = datetime.strptime(half_day_date, "%Y-%m-%d").date()
+        if not allow_past and half_day_date < current_date:
+            frappe.throw("Half-day leave cannot be applied for a past date.")
 
-        if half_day_date < today:
+        if half_day_date == current_date and nowtime() >= str(half_cut):
             frappe.throw(
-                _("❌ Half Day leave cannot be applied for a past date."),
-                title=_("Invalid Half Day Date")
+                "Half-day leave for today can only be applied before "
+                f"{half_cut}."
             )
 
-        if half_day_date == today and current_hour >= 13:
-            frappe.throw(
-                _(
-                    "⏰ Half Day leave for today must be applied before <b>1:00 PM</b>. "
-                    "Current time is {0}."
-                ).format(now.strftime("%I:%M %p")),
-                title=_("Half Day Leave Time Restriction")
-            )
-
-    # ─── Rule 4: Cannot apply more than 3 continuous days ───
     if not doc.half_day:
-        total_days = (to_date - from_date).days + 1  # inclusive count
-
-        if total_days > 3:
+        total_days = date_diff(to_date, from_date) + 1
+        if total_days > max_days:
             frappe.throw(
-                _(
-                    "❌ You cannot apply for more than <b>3 continuous days</b> of leave. "
-                    "You have selected <b>{0} days</b> ({1} to {2}). "
-                    "Please split your leave or contact HR."
-                ).format(
-                    total_days,
-                    from_date.strftime("%d-%m-%Y"),
-                    to_date.strftime("%d-%m-%Y")
-                ),
-                title=_("Continuous Leave Limit Exceeded")
+                f"You cannot apply for more than {max_days} continuous day(s) "
+                f"in one request. You selected {total_days} day(s)."
             )
 
-    # ─── Rule 5: REMOVED - From Time & To Time are NO LONGER MANDATORY ───
-    # The fields will show when half_day is checked, but users can leave them empty
-    # Only validate if BOTH are filled to ensure To Time > From Time
-    if doc.half_day:
-        if doc.from_time and doc.to_time:
-            # Only validate time range if both times are provided
-            if doc.from_time >= doc.to_time:
-                frappe.throw(
-                    _("⏰ <b>To Time</b> must be greater than <b>From Time</b>."),
-                    title=_("Invalid Time Range")
-                )
+    if doc.custom_from_time and doc.custom_to_time:
+        if get_time(doc.custom_from_time) >= get_time(doc.custom_to_time):
+            frappe.throw(
+                "Leave from time must be earlier than to time. "
+                "Please check the time fields and try again."
+            )
+
+    should_check_balance = getattr(doc, "docstatus", 0) == 1 or method in (
+        "before_submit",
+        "on_submit",
+    )
+    if should_check_balance:
+        check_leave_balance(doc, settings)
+
+
+def check_leave_balance(doc, settings):
+    """
+    Block leave submission if requested days exceed available allocation.
+    Only runs if enabled in Finstein HRMS Settings.
+    """
+    if not settings.enable_leave_balance_check:
+        return
+
+    allocation = frappe.db.get_value(
+        "Leave Allocation",
+        {
+            "employee": doc.employee,
+            "leave_type": doc.leave_type,
+            "from_date": ("<=", doc.from_date),
+            "to_date": (">=", doc.to_date),
+            "docstatus": 1,
+        },
+        ["total_leaves_allocated", "total_leaves_taken"],
+        as_dict=True,
+    )
+
+    if not allocation:
+        frappe.throw(
+            f"No active leave allocation found for {doc.leave_type}. "
+            "Please contact HR."
+        )
+
+    available = allocation.total_leaves_allocated - allocation.total_leaves_taken
+    requested = date_diff(doc.to_date, doc.from_date) + 1
+
+    if requested > available:
+        frappe.throw(
+            f"Insufficient leave balance for {doc.leave_type}. "
+            f"Available: {available} day(s). "
+            f"Requested: {requested} day(s). "
+            "Please adjust your leave dates or contact HR."
+        )

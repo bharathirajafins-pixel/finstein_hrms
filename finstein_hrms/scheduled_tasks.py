@@ -1,51 +1,92 @@
-import frappe
 import uuid
-from frappe.utils import nowdate, getdate
 from datetime import time
 
-# ============================================================
-# File: apps/your_app/your_app/scheduled_tasks.py
-# ============================================================
+import frappe
+from frappe.utils import getdate, nowdate, get_time
 
-# ── Time Windows ─────────────────────────────────────────────
-TIME_WINDOWS = {
-    "Breakfast": {"start": time(9,  0),  "end": time(11, 0),  "serving": "08:00:00"},
-    "Lunch":     {"start": time(12, 30), "end": time(15, 0),  "serving": "12:30:00"},
-    "Dinner":    {"start": time(19, 0),  "end": time(22, 0),  "serving": "19:00:00"},
-}
+from finstein_hrms.finstein_hrms.doctype.finstein_hrms_settings.finstein_hrms_settings import (
+    get_settings,
+)
 
 DAY_NAMES = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
 
 
+def _load_settings():
+    """Safely load settings with a sensible fallback during setup/migration."""
+    try:
+        return get_settings()
+    except Exception:
+        frappe.logger().warning("[MealSystem] Finstein HRMS Settings not available. Using defaults.")
+        return None
+
+
+def get_meal_windows():
+    """Read meal window times from Finstein HRMS Settings."""
+    settings = _load_settings()
+    if settings and not settings.enable_meal_system:
+        return None
+
+    breakfast_open = str(settings.meal_breakfast_open) if settings and settings.meal_breakfast_open else "09:00:00"
+    breakfast_close = str(settings.meal_breakfast_close) if settings and settings.meal_breakfast_close else "11:00:00"
+    lunch_open = str(settings.meal_lunch_open) if settings and settings.meal_lunch_open else "12:30:00"
+    lunch_close = str(settings.meal_lunch_close) if settings and settings.meal_lunch_close else "15:00:00"
+    dinner_open = str(settings.meal_dinner_open) if settings and settings.meal_dinner_open else "19:00:00"
+    dinner_close = str(settings.meal_dinner_close) if settings and settings.meal_dinner_close else "22:00:00"
+
+    return {
+        "Breakfast": {
+            "open": breakfast_open,
+            "close": breakfast_close,
+        },
+        "Lunch": {
+            "open": lunch_open,
+            "close": lunch_close,
+        },
+        "Dinner": {
+            "open": dinner_open,
+            "close": dinner_close,
+        },
+    }
+
+
 def _get_order_count(order_date, food_type):
+    """Return selected order count for a meal type on a date."""
     field_map = {
         "Breakfast": "breakfast_selected",
         "Lunch": "lunch_selected",
         "Dinner": "dinner_selected",
     }
-    db_field  = field_map.get(food_type)
+    db_field = field_map.get(food_type)
     if not db_field:
         return 0
-    return frappe.db.count("Food Count", filters=[
-        ["order_date", "=", order_date],
-        [db_field, "=", 1]
-    ])
+    return frappe.db.count(
+        "Food Count",
+        filters=[["order_date", "=", order_date], [db_field, "=", 1]],
+    )
 
 
 def _build_qr_payload(target_date, day_name, food_type, food_item, put_count):
-    win = TIME_WINDOWS[food_type]
+    """Build payload for Food QR insert/update."""
+    windows = get_meal_windows() or {}
+    slot = windows.get(food_type) or {}
+    start_time = slot.get("open", "09:00:00")
+    end_time = slot.get("close", "11:00:00")
+
     unique_id = uuid.uuid4().hex[:10].upper()
     qr_data = f"FQR|{target_date}|{food_type}|{unique_id}"
     qr_url = f"https://api.qrserver.com/v1/create-qr-code/?size=300x300&data={qr_data}"
+
+    open_display = get_time(start_time).strftime("%I:%M %p")
+    close_display = get_time(end_time).strftime("%I:%M %p")
 
     return {
         "date": target_date,
         "day": day_name,
         "food_type": food_type,
         "food_item": food_item,
-        "serving_time": win["serving"],
-        "window_start": win["start"].strftime("%H:%M:%S"),
-        "window_end": win["end"].strftime("%H:%M:%S"),
+        "serving_time": start_time,
+        "window_start": start_time,
+        "window_end": end_time,
         "status": "Scheduled",
         "food_put_count": put_count,
         "consumed_count": 0,
@@ -56,21 +97,25 @@ def _build_qr_payload(target_date, day_name, food_type, food_item, put_count):
             f'<img src="{qr_url}" style="width:240px;height:240px;'
             f'border-radius:12px;border:3px solid #f39c12;">'
             f'<p style="margin-top:10px;font-weight:700;font-size:16px;">'
-            f'{food_type} — {food_item}</p>'
+            f'{food_type} - {food_item}</p>'
             f'<p style="color:#888;font-size:12px;">{day_name}, {target_date}</p>'
             f'<p style="color:#aaa;font-size:11px;">Window: '
-            f'{win["start"].strftime("%I:%M %p")} – {win["end"].strftime("%I:%M %p")}</p>'
-            f'</div>'
+            f"{open_display} - {close_display}</p>"
+            f"</div>"
         ),
     }
 
 
 def generate_food_qr_for_date(target_date, food_type=None, force_regenerate=False):
     """
-    Generate Food QR for a specific date.
-    - If food_type is provided, generates/updates only that slot.
-    - If food_type is None, generates/updates all meal slots available in menu.
+    Generate Food QR records for a date.
+    Optionally limit generation to one meal type.
     """
+    settings = _load_settings()
+    if settings and not settings.enable_meal_system:
+        frappe.logger().info("[MealSystem] Disabled in settings. Skipping.")
+        return []
+
     target_date = str(target_date)
     target_day_name = DAY_NAMES[getdate(target_date).weekday()]
 
@@ -106,13 +151,16 @@ def generate_food_qr_for_date(target_date, food_type=None, force_regenerate=Fals
             "Food QR", {"date": target_date, "food_type": meal_type}, "name"
         )
 
-        # Keep existing QR unless regenerate is explicitly requested.
         if existing_name and not force_regenerate:
-            frappe.db.set_value("Food QR", existing_name, {
-                "day": target_day_name,
-                "food_item": food_item,
-                "food_put_count": put_count,
-            })
+            frappe.db.set_value(
+                "Food QR",
+                existing_name,
+                {
+                    "day": target_day_name,
+                    "food_item": food_item,
+                    "food_put_count": put_count,
+                },
+            )
             created_or_updated.append(existing_name)
             continue
 
@@ -124,6 +172,8 @@ def generate_food_qr_for_date(target_date, food_type=None, force_regenerate=Fals
             continue
 
         qr_doc = frappe.get_doc({"doctype": "Food QR", **payload})
+        if hasattr(qr_doc, "custom_dietary_preference"):
+            qr_doc.custom_dietary_preference = ""
         qr_doc.insert(ignore_permissions=True)
         created_or_updated.append(qr_doc.name)
 
@@ -131,10 +181,13 @@ def generate_food_qr_for_date(target_date, food_type=None, force_regenerate=Fals
     return created_or_updated
 
 
-# ============================================================
-# SCHEDULED: Daily — Create Food QR records for today
-# ============================================================
 def create_food_qr_records():
+    """Daily scheduler to generate Food QR records for today."""
+    settings = _load_settings()
+    if settings and not settings.enable_meal_system:
+        frappe.logger().info("[MealSystem] Disabled in settings. Skipping.")
+        return
+
     try:
         created = generate_food_qr_for_date(nowdate())
         frappe.logger().info(f"[Food QR] Daily generation complete for {nowdate()} -> {created}")
@@ -142,28 +195,32 @@ def create_food_qr_records():
         frappe.logger().exception("[Food QR] Daily generation failed")
 
 
-# ============================================================
-# DOC EVENT: Food Count after_insert / on_update
-# ============================================================
 def update_food_qr_count(doc, method=None):
     """
-    1. Updates food_put_count in Food QR live
-    2. Sets meal status on Food Count:
-       ordered   → Pending
-       cleared   → Not Ordered
-       Consumed  → unchanged (never overwritten)
+    Keep food_put_count and per-user meal statuses in sync when Food Count changes.
     """
+    settings = _load_settings()
+    if settings and not settings.enable_meal_system:
+        frappe.logger().info("[MealSystem] Disabled in settings. Skipping.")
+        return
+
     order_date = doc.order_date
 
-    # Always reload from DB to get latest saved values
-    # (doc object in on_update may have stale data)
     fresh = frappe.db.get_value(
         "Food Count",
         doc.name,
-        ["breakfast", "lunch", "dinner",
-         "breakfast_selected", "lunch_selected", "dinner_selected",
-         "breakfast_status", "lunch_status", "dinner_status"],
-        as_dict=True
+        [
+            "breakfast",
+            "lunch",
+            "dinner",
+            "breakfast_selected",
+            "lunch_selected",
+            "dinner_selected",
+            "breakfast_status",
+            "lunch_status",
+            "dinner_status",
+        ],
+        as_dict=True,
     )
 
     if not fresh:
@@ -171,94 +228,229 @@ def update_food_qr_count(doc, method=None):
 
     field_map = {
         "Breakfast": ("breakfast_selected", "breakfast_status"),
-        "Lunch":     ("lunch_selected",     "lunch_status"),
-        "Dinner":    ("dinner_selected",    "dinner_status"),
+        "Lunch": ("lunch_selected", "lunch_status"),
+        "Dinner": ("dinner_selected", "dinner_status"),
     }
 
     status_updates = {}
 
     for food_type, (selected_field, status_field) in field_map.items():
-
-        # ── Update food_put_count in Food QR ─────────────────
         new_count = _get_order_count(order_date, food_type)
-        qr_name   = frappe.db.get_value("Food QR",
-            {"date": order_date, "food_type": food_type}, "name")
+        qr_name = frappe.db.get_value(
+            "Food QR", {"date": order_date, "food_type": food_type}, "name"
+        )
         if qr_name:
             frappe.db.set_value("Food QR", qr_name, "food_put_count", new_count)
 
-        # ── Update status on Food Count ───────────────────────
-        # Never overwrite a Consumed status
         current_status = fresh.get(status_field, "") or ""
         if current_status == "Consumed":
             continue
 
-        # Use selected checkbox to decide if ordered.
         is_selected = int(fresh.get(selected_field, 0) or getattr(doc, selected_field, 0) or 0)
         status_updates[status_field] = "Pending" if is_selected else "Not Ordered"
 
     if status_updates:
         frappe.db.set_value("Food Count", doc.name, status_updates)
-        # Force immediate DB flush so UI refresh shows updated status
         frappe.db.commit()
 
 
-# ============================================================
-# SCHEDULED: Mark Not Consumed + Close QR after window ends
-# ============================================================
 def mark_breakfast_not_consumed():
+    """Mark breakfast pending items as not consumed and close breakfast QR."""
+    settings = _load_settings()
+    if settings and not settings.enable_meal_system:
+        frappe.logger().info("[MealSystem] Disabled in settings. Skipping.")
+        return
     today = nowdate()
     _mark_not_consumed(today, "breakfast_selected", "breakfast_status")
     _close_food_qr(today, "Breakfast")
 
+
 def mark_lunch_not_consumed():
+    """Mark lunch pending items as not consumed and close lunch QR."""
+    settings = _load_settings()
+    if settings and not settings.enable_meal_system:
+        frappe.logger().info("[MealSystem] Disabled in settings. Skipping.")
+        return
     today = nowdate()
     _mark_not_consumed(today, "lunch_selected", "lunch_status")
     _close_food_qr(today, "Lunch")
 
+
 def mark_dinner_not_consumed():
+    """Mark dinner pending items as not consumed and close dinner QR."""
+    settings = _load_settings()
+    if settings and not settings.enable_meal_system:
+        frappe.logger().info("[MealSystem] Disabled in settings. Skipping.")
+        return
     today = nowdate()
     _mark_not_consumed(today, "dinner_selected", "dinner_status")
     _close_food_qr(today, "Dinner")
 
+
 def _mark_not_consumed(order_date, selected_field, status_field):
+    """Convert remaining pending orders to Not Consumed for one meal slot."""
     records = frappe.get_list(
         "Food Count",
         filters=[
             ["order_date", "=", order_date],
             [selected_field, "=", 1],
-            [status_field, "=", "Pending"]
+            [status_field, "=", "Pending"],
         ],
-        fields=["name"]
+        fields=["name"],
     )
-    for r in records:
-        frappe.db.set_value("Food Count", r["name"], status_field, "Not Consumed")
+    for record in records:
+        frappe.db.set_value("Food Count", record["name"], status_field, "Not Consumed")
     frappe.db.commit()
     frappe.logger().info(f"[Food QR] Marked {len(records)} as Not Consumed")
 
-def _close_food_qr(date, food_type):
-    qr_name = frappe.db.get_value("Food QR",
-        {"date": date, "food_type": food_type}, "name")
+
+def _close_food_qr(date_value, food_type):
+    """Close Food QR slot after serving window ends."""
+    qr_name = frappe.db.get_value("Food QR", {"date": date_value, "food_type": food_type}, "name")
     if qr_name:
         frappe.db.set_value("Food QR", qr_name, "status", "Closed")
         frappe.db.commit()
 
 
-# ============================================================
-# SCHEDULED: Activate QR at window start
-# ============================================================
 def activate_breakfast_qr():
+    """Activate breakfast QR slot for today's date."""
+    settings = _load_settings()
+    if settings and not settings.enable_meal_system:
+        frappe.logger().info("[MealSystem] Disabled in settings. Skipping.")
+        return
     _activate_food_qr(nowdate(), "Breakfast")
 
+
 def activate_lunch_qr():
+    """Activate lunch QR slot for today's date."""
+    settings = _load_settings()
+    if settings and not settings.enable_meal_system:
+        frappe.logger().info("[MealSystem] Disabled in settings. Skipping.")
+        return
     _activate_food_qr(nowdate(), "Lunch")
 
+
 def activate_dinner_qr():
+    """Activate dinner QR slot for today's date."""
+    settings = _load_settings()
+    if settings and not settings.enable_meal_system:
+        frappe.logger().info("[MealSystem] Disabled in settings. Skipping.")
+        return
     _activate_food_qr(nowdate(), "Dinner")
 
-def _activate_food_qr(date, food_type):
-    qr_name = frappe.db.get_value("Food QR",
-        {"date": date, "food_type": food_type}, "name")
+
+def _activate_food_qr(date_value, food_type):
+    """Activate Food QR slot if record exists."""
+    qr_name = frappe.db.get_value("Food QR", {"date": date_value, "food_type": food_type}, "name")
     if qr_name:
         frappe.db.set_value("Food QR", qr_name, "status", "Active")
         frappe.db.commit()
-        frappe.logger().info(f"[Food QR] Activated {food_type} for {date}")
+        frappe.logger().info(f"[Food QR] Activated {food_type} for {date_value}")
+
+
+def escalate_pending_approvals():
+    """
+    Send escalation reminders for pending leave and attendance approvals.
+    """
+    settings = get_settings()
+
+    if not settings.enable_escalation_reminders:
+        return
+
+    days = settings.escalation_days or 2
+    cutoff = frappe.utils.add_days(frappe.utils.today(), -days)
+    fallback_email = settings.escalation_email
+
+    pending_leaves = frappe.get_all(
+        "Leave Application",
+        filters={
+            "workflow_state": ["in", ["Pending", "Pending HR Approve"]],
+            "modified": ("<", cutoff),
+        },
+        fields=["name", "employee", "leave_approver", "from_date", "to_date", "modified"],
+    )
+
+    for leave in pending_leaves:
+        recipient = leave.leave_approver or fallback_email
+        if not recipient:
+            continue
+
+        frappe.sendmail(
+            recipients=[recipient],
+            subject=f"Action Required: Leave Application {leave.name} is awaiting your review",
+            message=(
+                f"This is a reminder that Leave Application {leave.name} for employee "
+                f"{leave.employee} ({leave.from_date} to {leave.to_date}) has been pending "
+                f"since {leave.modified} and requires your action. "
+                f"Please log in to ERPNext to review."
+            ),
+        )
+
+        frappe.logger().info(
+            f"[Escalation] Reminder sent to {recipient} for leave {leave.name}"
+        )
+
+    pending_attendance = frappe.get_all(
+        "Attendance Request",
+        filters={
+            "workflow_state": ["in", ["Pending", "Pending HR Approve"]],
+            "modified": ("<", cutoff),
+        },
+        fields=["name", "employee", "modified"],
+    )
+
+    for attendance in pending_attendance:
+        approver = frappe.db.get_value("Attendance Request", attendance.name, "approver")
+        recipient = approver or fallback_email
+        if not recipient:
+            continue
+
+        frappe.sendmail(
+            recipients=[recipient],
+            subject=f"Action Required: Attendance Request {attendance.name} is awaiting your review",
+            message=(
+                f"Attendance Request {attendance.name} for employee {attendance.employee} "
+                f"has been pending since {attendance.modified}. "
+                f"Please log in to ERPNext to review."
+            ),
+        )
+
+    frappe.logger().info(
+        f"[Escalation] Processed {len(pending_leaves)} leave(s) and "
+        f"{len(pending_attendance)} attendance request(s)."
+    )
+
+
+def lock_attendance_for_processed_payroll():
+    """
+    Lock submitted Attendance records for periods covered by submitted payroll entries.
+    """
+    settings = get_settings()
+    if not settings.enable_payroll_period_lock:
+        return
+
+    submitted_payrolls = frappe.get_all(
+        "Payroll Entry",
+        filters={"docstatus": 1},
+        fields=["start_date", "end_date"],
+    )
+
+    for payroll in submitted_payrolls:
+        frappe.db.sql(
+            """
+            UPDATE `tabAttendance`
+            SET custom_locked = 1
+            WHERE attendance_date BETWEEN %(start)s AND %(end)s
+            AND docstatus = 1
+            AND (custom_locked IS NULL OR custom_locked = 0)
+            """,
+            {
+                "start": payroll.start_date,
+                "end": payroll.end_date,
+            },
+        )
+
+    frappe.db.commit()
+    frappe.logger().info(
+        f"[PayrollLock] Locked attendance for {len(submitted_payrolls)} payroll period(s)."
+    )
