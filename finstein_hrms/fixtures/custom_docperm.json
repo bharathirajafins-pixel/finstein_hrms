@@ -1736,7 +1736,7 @@
   "doctype": "Custom DocPerm",
   "email": 1,
   "export": 0,
-  "if_owner": 0,
+  "if_owner": 1,
   "import": 0,
   "modified": "2026-02-19 15:38:28.689818",
   "name": "iouns14blm",

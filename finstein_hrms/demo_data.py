@@ -20,7 +20,7 @@ DEMO_USERS = [
         "email": "demo.hr@finstein.local",
         "first_name": "Demo",
         "last_name": "HR",
-        "roles": ["HR Manager"],
+        "roles": ["Employee", "HR Manager"],
         "gender": "Female",
         "date_of_birth": "1992-08-18",
         "date_of_joining": "2025-04-01",
@@ -30,7 +30,7 @@ DEMO_USERS = [
         "email": "demo.tl@finstein.local",
         "first_name": "Demo",
         "last_name": "Team Lead",
-        "roles": ["Team Leader"],
+        "roles": ["Employee", "Team Leader"],
         "gender": "Male",
         "date_of_birth": "1994-11-04",
         "date_of_joining": "2025-02-10",
@@ -40,7 +40,7 @@ DEMO_USERS = [
         "email": "demo.ceo@finstein.local",
         "first_name": "Demo",
         "last_name": "CEO",
-        "roles": ["Head"],
+        "roles": ["Employee", "Head"],
         "gender": "Female",
         "date_of_birth": "1988-01-23",
         "date_of_joining": "2024-01-01",
@@ -162,11 +162,13 @@ def _ensure_demo_user(row):
     if created:
         user.insert(ignore_permissions=True)
 
-    for role in row["roles"]:
-        if role not in [d.role for d in user.roles]:
-            user.append("roles", {"role": role})
-
     user.save(ignore_permissions=True)
+
+    current_roles = {d.role for d in user.roles}
+    missing_roles = [role for role in row["roles"] if role not in current_roles]
+    if missing_roles:
+        user.add_roles(*missing_roles)
+
     user.new_password = DEMO_PASSWORD
     user.save(ignore_permissions=True)
 
