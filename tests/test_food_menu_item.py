@@ -3,7 +3,7 @@ from frappe.tests.utils import FrappeTestCase
 
 
 class TestFoodMenuItem(FrappeTestCase):
-    """Real tests for Food Menu Item DocType."""
+    """Tests for Food Menu Item DocType."""
 
     def setUp(self):
         self.test_records = []
@@ -17,25 +17,25 @@ class TestFoodMenuItem(FrappeTestCase):
         doc = frappe.get_doc(
             {
                 "doctype": "Food Menu Item",
-                "day": "Monday",
-                "breakfast_item": "Idli",
-                "lunch_item": "Meals",
-                "dinner_item": "Chapati",
+                "day": "Tuesday",
+                "breakfast_item": "Pongal",
+                "lunch_item": "Rice",
+                "dinner_item": "Dosa",
                 "available": 1,
             }
         )
         doc.insert(ignore_permissions=True)
         self.test_records.append(doc.name)
-        self.assertEqual(doc.day, "Monday")
+        self.assertEqual(doc.day, "Tuesday")
 
     def test_menu_item_requires_breakfast_item(self):
         with self.assertRaises(Exception):
             doc = frappe.get_doc(
                 {
                     "doctype": "Food Menu Item",
-                    "day": "Monday",
-                    "lunch_item": "Meals",
-                    "dinner_item": "Chapati",
+                    "day": "Tuesday",
+                    "lunch_item": "Rice",
+                    "dinner_item": "Dosa",
                 }
             )
             doc.insert(ignore_permissions=True)

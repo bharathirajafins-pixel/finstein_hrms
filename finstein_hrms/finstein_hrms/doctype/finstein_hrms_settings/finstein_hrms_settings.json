@@ -1,0 +1,446 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "creation": "2026-03-11 00:00:00.000000",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "leave_policy_section",
+  "max_continuous_leave_days",
+  "leave_submission_cutoff_time",
+  "half_day_cutoff_time",
+  "leave_col_break",
+  "allow_past_date_leave",
+  "enable_leave_balance_check",
+  "enable_leave_withdrawal",
+  "attendance_policy_section",
+  "max_attendance_requests_per_month",
+  "allowed_attendance_statuses",
+  "attendance_col_break",
+  "restrict_to_current_month",
+  "enable_attendance_lock_after_payroll",
+  "checkin_policy_section",
+  "min_checkin_hours",
+  "shift_start_time",
+  "shift_end_time",
+  "checkin_col_break",
+  "enable_late_entry_tagging",
+  "enable_early_exit_tagging",
+  "enable_overtime_tracking",
+  "enable_force_checkout",
+  "approval_section",
+  "escalation_days",
+  "escalation_email",
+  "approval_col_break",
+  "enable_escalation_reminders",
+  "enable_auto_rejection",
+  "auto_reject_days",
+  "meal_settings_section",
+  "enable_meal_system",
+  "meal_breakfast_open",
+  "meal_breakfast_close",
+  "meal_col_break_1",
+  "meal_lunch_open",
+  "meal_lunch_close",
+  "meal_section_2",
+  "meal_dinner_open",
+  "meal_dinner_close",
+  "meal_col_break_2",
+  "enable_meal_pre_order",
+  "enable_meal_cancellation",
+  "enable_dietary_preference",
+  "notification_settings_section",
+  "notification_col_break",
+  "enable_email_notifications",
+  "enable_inapp_notifications",
+  "notification_sender_email",
+  "payroll_settings_section",
+  "enable_payroll_readiness_check",
+  "enable_payroll_period_lock",
+  "payroll_col_break",
+  "auto_email_salary_slips",
+  "payroll_notification_email"
+ ],
+ "fields": [
+  {
+   "fieldname": "leave_policy_section",
+   "fieldtype": "Section Break",
+   "label": "Leave Policy"
+  },
+  {
+   "default": "3",
+   "description": "Maximum consecutive days per single leave application.",
+   "fieldname": "max_continuous_leave_days",
+   "fieldtype": "Int",
+   "label": "Maximum Continuous Leave Days",
+   "reqd": 1
+  },
+  {
+   "default": "17:00:00",
+   "description": "Employees cannot apply for today's leave after this time.",
+   "fieldname": "leave_submission_cutoff_time",
+   "fieldtype": "Time",
+   "label": "Leave Submission Cutoff Time (Today)",
+   "reqd": 1
+  },
+  {
+   "default": "12:00:00",
+   "description": "Separate cutoff for half-day leave applications.",
+   "fieldname": "half_day_cutoff_time",
+   "fieldtype": "Time",
+   "label": "Half Day Leave Cutoff Time",
+   "reqd": 1
+  },
+  {
+   "fieldname": "leave_col_break",
+   "fieldtype": "Column Break"
+  },
+  {
+   "default": "0",
+   "description": "If enabled, employees can apply for past dates.",
+   "fieldname": "allow_past_date_leave",
+   "fieldtype": "Check",
+   "label": "Allow Past Date Leave Applications"
+  },
+  {
+   "default": "1",
+   "description": "Block submission if employee has insufficient balance.",
+   "fieldname": "enable_leave_balance_check",
+   "fieldtype": "Check",
+   "label": "Enable Leave Balance Check on Submission"
+  },
+  {
+   "default": "1",
+   "description": "Show Withdraw button on pending leave applications.",
+   "fieldname": "enable_leave_withdrawal",
+   "fieldtype": "Check",
+   "label": "Allow Employees to Withdraw Pending Applications"
+  },
+  {
+   "fieldname": "attendance_policy_section",
+   "fieldtype": "Section Break",
+   "label": "Attendance Policy"
+  },
+  {
+   "default": "5",
+   "fieldname": "max_attendance_requests_per_month",
+   "fieldtype": "Int",
+   "label": "Maximum Attendance Requests Per Month",
+   "reqd": 1
+  },
+  {
+   "default": "Present\nWork From Home\nHalf Day",
+   "description": "One status per line. Only these are accepted.",
+   "fieldname": "allowed_attendance_statuses",
+   "fieldtype": "Small Text",
+   "label": "Allowed Attendance Statuses",
+   "reqd": 1
+  },
+  {
+   "fieldname": "attendance_col_break",
+   "fieldtype": "Column Break"
+  },
+  {
+   "default": "1",
+   "fieldname": "restrict_to_current_month",
+   "fieldtype": "Check",
+   "label": "Restrict Attendance Requests to Current Month Only"
+  },
+  {
+   "default": "1",
+   "fieldname": "enable_attendance_lock_after_payroll",
+   "fieldtype": "Check",
+   "label": "Lock Attendance After Payroll is Processed"
+  },
+  {
+   "fieldname": "checkin_policy_section",
+   "fieldtype": "Section Break",
+   "label": "Check-In / Check-Out Policy"
+  },
+  {
+   "default": "8.0",
+   "fieldname": "min_checkin_hours",
+   "fieldtype": "Float",
+   "label": "Minimum Working Hours Before Checkout",
+   "precision": "1",
+   "reqd": 1
+  },
+  {
+   "default": "09:00:00",
+   "description": "Used to calculate late arrivals.",
+   "fieldname": "shift_start_time",
+   "fieldtype": "Time",
+   "label": "Standard Shift Start Time"
+  },
+  {
+   "default": "18:00:00",
+   "description": "Used to calculate early departures.",
+   "fieldname": "shift_end_time",
+   "fieldtype": "Time",
+   "label": "Standard Shift End Time"
+  },
+  {
+   "fieldname": "checkin_col_break",
+   "fieldtype": "Column Break"
+  },
+  {
+   "default": "1",
+   "fieldname": "enable_late_entry_tagging",
+   "fieldtype": "Check",
+   "label": "Enable Late Entry Tagging on Attendance"
+  },
+  {
+   "default": "1",
+   "fieldname": "enable_early_exit_tagging",
+   "fieldtype": "Check",
+   "label": "Enable Early Exit Tagging on Attendance"
+  },
+  {
+   "default": "1",
+   "fieldname": "enable_overtime_tracking",
+   "fieldtype": "Check",
+   "label": "Enable Overtime Hour Tracking"
+  },
+  {
+   "default": "1",
+   "fieldname": "enable_force_checkout",
+   "fieldtype": "Check",
+   "label": "Enable Force Checkout for Administrators"
+  },
+  {
+   "fieldname": "approval_section",
+   "fieldtype": "Section Break",
+   "label": "Approval and Escalation Policy"
+  },
+  {
+   "default": "2",
+   "description": "Remind TL after this many days of inaction.",
+   "fieldname": "escalation_days",
+   "fieldtype": "Int",
+   "label": "Escalation Trigger Days Without Action",
+   "reqd": 1
+  },
+  {
+   "description": "Used when TL has no email configured.",
+   "fieldname": "escalation_email",
+   "fieldtype": "Data",
+   "label": "Escalation Fallback Email",
+   "options": "Email"
+  },
+  {
+   "fieldname": "approval_col_break",
+   "fieldtype": "Column Break"
+  },
+  {
+   "default": "1",
+   "fieldname": "enable_escalation_reminders",
+   "fieldtype": "Check",
+   "label": "Enable Escalation Reminder Emails"
+  },
+  {
+   "default": "0",
+   "fieldname": "enable_auto_rejection",
+   "fieldtype": "Check",
+   "label": "Auto-Reject Applications After Extended Inactivity"
+  },
+  {
+   "default": "7",
+   "depends_on": "eval:doc.enable_auto_rejection == 1",
+   "description": "Only active if auto-rejection is enabled.",
+   "fieldname": "auto_reject_days",
+   "fieldtype": "Int",
+   "label": "Auto-Reject After Days"
+  },
+  {
+   "fieldname": "meal_settings_section",
+   "fieldtype": "Section Break",
+   "label": "Meal Ordering and QR Settings"
+  },
+  {
+   "default": "1",
+   "description": "Master switch. Disabling stops all QR cron jobs.",
+   "fieldname": "enable_meal_system",
+   "fieldtype": "Check",
+   "label": "Enable Meal Ordering System"
+  },
+  {
+   "default": "09:00:00",
+   "depends_on": "eval:doc.enable_meal_system == 1",
+   "fieldname": "meal_breakfast_open",
+   "fieldtype": "Time",
+   "label": "Breakfast Window Opens"
+  },
+  {
+   "default": "11:00:00",
+   "depends_on": "eval:doc.enable_meal_system == 1",
+   "fieldname": "meal_breakfast_close",
+   "fieldtype": "Time",
+   "label": "Breakfast Window Closes"
+  },
+  {
+   "fieldname": "meal_col_break_1",
+   "fieldtype": "Column Break"
+  },
+  {
+   "default": "12:30:00",
+   "depends_on": "eval:doc.enable_meal_system == 1",
+   "fieldname": "meal_lunch_open",
+   "fieldtype": "Time",
+   "label": "Lunch Window Opens"
+  },
+  {
+   "default": "15:00:00",
+   "depends_on": "eval:doc.enable_meal_system == 1",
+   "fieldname": "meal_lunch_close",
+   "fieldtype": "Time",
+   "label": "Lunch Window Closes"
+  },
+  {
+   "depends_on": "eval:doc.enable_meal_system == 1",
+   "fieldname": "meal_section_2",
+   "fieldtype": "Section Break",
+   "label": ""
+  },
+  {
+   "default": "19:00:00",
+   "depends_on": "eval:doc.enable_meal_system == 1",
+   "fieldname": "meal_dinner_open",
+   "fieldtype": "Time",
+   "label": "Dinner Window Opens"
+  },
+  {
+   "default": "22:00:00",
+   "depends_on": "eval:doc.enable_meal_system == 1",
+   "fieldname": "meal_dinner_close",
+   "fieldtype": "Time",
+   "label": "Dinner Window Closes"
+  },
+  {
+   "fieldname": "meal_col_break_2",
+   "fieldtype": "Column Break"
+  },
+  {
+   "default": "0",
+   "depends_on": "eval:doc.enable_meal_system == 1",
+   "fieldname": "enable_meal_pre_order",
+   "fieldtype": "Check",
+   "label": "Allow Pre-Ordering Before Window Opens"
+  },
+  {
+   "default": "1",
+   "depends_on": "eval:doc.enable_meal_system == 1",
+   "fieldname": "enable_meal_cancellation",
+   "fieldtype": "Check",
+   "label": "Allow Meal Order Cancellation Before Window Opens"
+  },
+  {
+   "default": "1",
+   "depends_on": "eval:doc.enable_meal_system == 1",
+   "fieldname": "enable_dietary_preference",
+   "fieldtype": "Check",
+   "label": "Enable Dietary Preference on Employee Profile"
+  },
+  {
+   "fieldname": "notification_settings_section",
+   "fieldtype": "Section Break",
+   "label": "Notification Settings"
+  },
+  {
+   "fieldname": "notification_col_break",
+   "fieldtype": "Column Break"
+  },
+  {
+   "default": "1",
+   "fieldname": "enable_email_notifications",
+   "fieldtype": "Check",
+   "label": "Enable Email Notifications"
+  },
+  {
+   "default": "1",
+   "fieldname": "enable_inapp_notifications",
+   "fieldtype": "Check",
+   "label": "Enable In-App Notifications"
+  },
+  {
+   "fieldname": "notification_sender_email",
+   "fieldtype": "Data",
+   "label": "Notification Sender Email",
+   "options": "Email"
+  },
+  {
+   "fieldname": "payroll_settings_section",
+   "fieldtype": "Section Break",
+   "label": "Payroll Settings"
+  },
+  {
+   "default": "1",
+   "fieldname": "enable_payroll_readiness_check",
+   "fieldtype": "Check",
+   "label": "Enable Payroll Readiness Check Button"
+  },
+  {
+   "default": "1",
+   "fieldname": "enable_payroll_period_lock",
+   "fieldtype": "Check",
+   "label": "Lock Attendance After Payroll Submission"
+  },
+  {
+   "fieldname": "payroll_col_break",
+   "fieldtype": "Column Break"
+  },
+  {
+   "default": "0",
+   "fieldname": "auto_email_salary_slips",
+   "fieldtype": "Check",
+   "label": "Auto Email Salary Slips to Employees After Payroll"
+  },
+  {
+   "fieldname": "payroll_notification_email",
+   "fieldtype": "Data",
+   "label": "Payroll Processed Notification Email",
+   "options": "Email"
+  }
+ ],
+ "grid_page_length": 50,
+ "index_web_pages_for_search": 1,
+ "issingle": 1,
+ "links": [],
+ "modified": "2026-03-11 00:00:00.000000",
+ "modified_by": "Administrator",
+ "module": "Finstein_hrms",
+ "name": "Finstein HRMS Settings",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "HR Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "row_format": "Dynamic",
+ "rows_threshold_for_grid_search": 20,
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": [],
+ "track_changes": 1
+}

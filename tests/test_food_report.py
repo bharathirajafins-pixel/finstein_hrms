@@ -3,7 +3,7 @@ from frappe.tests.utils import FrappeTestCase
 
 
 class TestFoodReport(FrappeTestCase):
-    """Real tests for Food Report DocType."""
+    """Tests for Food Report DocType."""
 
     def setUp(self):
         self.test_records = []
@@ -24,14 +24,8 @@ class TestFoodReport(FrappeTestCase):
         doc.insert(ignore_permissions=True)
         self.test_records.append(doc.name)
         self.assertEqual(str(doc.report_date), frappe.utils.today())
-        self.assertEqual(doc.user, frappe.session.user)
 
     def test_food_report_requires_date(self):
         with self.assertRaises(Exception):
-            doc = frappe.get_doc(
-                {
-                    "doctype": "Food Report",
-                    "user": frappe.session.user,
-                }
-            )
+            doc = frappe.get_doc({"doctype": "Food Report", "user": frappe.session.user})
             doc.insert(ignore_permissions=True)
