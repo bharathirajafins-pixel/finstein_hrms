@@ -1,7 +1,16 @@
 frappe.ui.form.on('Leave Application', {
+    onload(frm) {
+        sync_leave_approver_requirement(frm);
+    },
+
     refresh(frm) {
+        sync_leave_approver_requirement(frm);
         toggle_time_fields(frm);
         add_withdraw_button(frm);
+    },
+
+    employee(frm) {
+        sync_leave_approver_requirement(frm);
     },
 
     half_day(frm) {
@@ -13,6 +22,47 @@ frappe.ui.form.on('Leave Application', {
         }
     },
 });
+
+async function sync_leave_approver_requirement(frm) {
+    if (!frm.doc.employee) return;
+
+    const isMandatory = await frappe.db.get_single_value(
+        'HR Settings',
+        'leave_approver_mandatory_in_leave_application'
+    );
+
+    if (!isMandatory) {
+        frm.set_df_property('leave_approver', 'reqd', 0);
+        return;
+    }
+
+    const employeeRes = await frappe.db.get_value('Employee', frm.doc.employee, 'user_id');
+    const employeeUser = employeeRes?.message?.user_id;
+
+    if (!employeeUser) {
+        frm.set_df_property('leave_approver', 'reqd', 1);
+        return;
+    }
+
+    const roleRes = await frappe.db.get_value(
+        'Has Role',
+        {
+            parent: employeeUser,
+            parenttype: 'User',
+            role: 'Team Leader',
+        },
+        'name'
+    );
+
+    const isTeamLeaderApplicant = !!roleRes?.message?.name;
+
+    frm.set_df_property('leave_approver', 'reqd', isTeamLeaderApplicant ? 0 : 1);
+
+    if (isTeamLeaderApplicant && frm.doc.leave_approver) {
+        await frm.set_value('leave_approver', '');
+        await frm.set_value('leave_approver_name', '');
+    }
+}
 
 function toggle_time_fields(frm) {
     const showTimeFields = !!frm.doc.half_day;
