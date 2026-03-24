@@ -1,5 +1,6 @@
 import frappe
-from frappe.utils import date_diff, getdate, get_time, nowtime, today
+from frappe.utils import date_diff, flt, getdate, get_time, nowtime, today
+from hrms.hr.doctype.leave_application.leave_application import get_leave_balance_on
 
 from finstein_hrms.finstein_hrms.doctype.finstein_hrms_settings.finstein_hrms_settings import (
     get_settings,
@@ -89,7 +90,7 @@ def check_leave_balance(doc, settings):
             "to_date": (">=", doc.to_date),
             "docstatus": 1,
         },
-        ["total_leaves_allocated", "total_leaves_taken"],
+        ["name", "total_leaves_allocated"],
         as_dict=True,
     )
 
@@ -99,8 +100,16 @@ def check_leave_balance(doc, settings):
             "Please contact HR."
         )
 
-    available = allocation.total_leaves_allocated - allocation.total_leaves_taken
-    requested = date_diff(doc.to_date, doc.from_date) + 1
+    balance = get_leave_balance_on(
+        doc.employee,
+        doc.leave_type,
+        doc.from_date,
+        doc.to_date,
+        consider_all_leaves_in_the_allocation_period=True,
+        for_consumption=True,
+    )
+    available = flt(balance.get("leave_balance_for_consumption"))
+    requested = flt(doc.total_leave_days or (date_diff(doc.to_date, doc.from_date) + 1))
 
     if requested > available:
         frappe.throw(
