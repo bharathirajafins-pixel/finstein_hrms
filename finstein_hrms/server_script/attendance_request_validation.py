@@ -15,6 +15,8 @@ def validate(doc, method=None):
 
 def validate_attendance_request(doc, method=None):
     """Validate attendance correction request against policy."""
+    _set_attendance_request_approver(doc)
+
     settings = get_settings()
     max_req = settings.max_attendance_requests_per_month or 5
     curr_only = settings.restrict_to_current_month
@@ -133,6 +135,27 @@ def check_attendance_not_locked(doc):
                 "been processed for this period. Please contact HR if a "
                 "correction is needed."
             )
+
+
+def _set_attendance_request_approver(doc):
+    """Map attendance requests to the employee's assigned TL."""
+    employee_user = frappe.db.get_value("Employee", doc.employee, "user_id")
+    doc.approver = frappe.db.get_value("Employee", doc.employee, "shift_request_approver")
+
+    is_team_leader = bool(
+        employee_user
+        and frappe.db.get_value(
+            "Has Role",
+            {"parent": employee_user, "parenttype": "User", "role": "Team Leader"},
+            "name",
+        )
+    )
+
+    if not is_team_leader and doc.workflow_state == "Pending" and not doc.approver:
+        frappe.throw(
+            "Shift Request Approver is not set for this employee. "
+            "Please contact HR to assign the Team Leader before submitting the request."
+        )
 
 
 def _date_range(start_date, end_date):

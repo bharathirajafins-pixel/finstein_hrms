@@ -115,8 +115,8 @@
     "parent": "Attendance Request Pending Your Approval",
     "parentfield": "recipients",
     "parenttype": "Notification",
-    "receiver_by_document_field": "",
-    "receiver_by_role": "Team Leader"
+    "receiver_by_document_field": "approver",
+    "receiver_by_role": null
    },
    {
     "bcc": null,
@@ -383,8 +383,8 @@
     "parent": "Attendance Request Routing",
     "parentfield": "recipients",
     "parenttype": "Notification",
-    "receiver_by_document_field": "",
-    "receiver_by_role": "Team Leader"
+    "receiver_by_document_field": "approver",
+    "receiver_by_role": null
    },
    {
     "bcc": null,

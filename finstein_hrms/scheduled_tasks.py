@@ -396,17 +396,24 @@ def escalate_pending_approvals():
             "workflow_state": ["in", ["Pending", "Pending HR Approve"]],
             "modified": ("<", cutoff),
         },
-        fields=["name", "employee", "modified"],
+        fields=["name", "employee", "approver", "workflow_state", "modified"],
     )
 
     for attendance in pending_attendance:
-        approver = frappe.db.get_value("Attendance Request", attendance.name, "approver")
-        recipient = approver or fallback_email
+        if attendance.workflow_state == "Pending":
+            recipient = attendance.approver or fallback_email
+        else:
+            hr_recipients = frappe.get_all(
+                "Has Role",
+                filters={"role": "HR Manager", "parenttype": "User"},
+                pluck="parent",
+            )
+            recipient = hr_recipients or ([fallback_email] if fallback_email else [])
         if not recipient:
             continue
 
         frappe.sendmail(
-            recipients=[recipient],
+            recipients=recipient if isinstance(recipient, list) else [recipient],
             subject=f"Action Required: Attendance Request {attendance.name} is awaiting your review",
             message=(
                 f"Attendance Request {attendance.name} for employee {attendance.employee} "
