@@ -244,6 +244,24 @@ def withdraw_leave_application(docname):
 
 
 @frappe.whitelist()
+def is_employee_team_leader(employee):
+    """
+    Return whether the selected employee's linked user has the Team Leader role.
+    """
+    if not employee:
+        return {"is_team_leader": False}
+
+    employee_user = frappe.db.get_value("Employee", employee, "user_id")
+    if not employee_user:
+        return {"is_team_leader": False}
+
+    return {
+        "is_team_leader": "Team Leader" in frappe.get_roles(employee_user),
+        "user_id": employee_user,
+    }
+
+
+@frappe.whitelist()
 def cancel_meal_order(qr_name):
     """
     Cancel current user's meal order for a QR slot before serving window opens.
