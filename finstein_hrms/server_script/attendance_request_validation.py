@@ -106,6 +106,12 @@ def validate_attendance_request(doc, method=None):
             )
 
         if allowed and attendance.status not in allowed:
+            if allowed == ["Absent"]:
+                frappe.throw(
+                    f"Attendance Request can only be raised for Absent days. "
+                    f"Found '{attendance.status}' on {check_date}."
+                )
+
             allowed_display = ", ".join(allowed)
             frappe.throw(
                 f"Attendance Request is only allowed for these statuses: "
