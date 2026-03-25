@@ -1,7 +1,7 @@
 [
  {
   "allow_past_date_leave": 0,
-  "allowed_attendance_statuses": "Present\nWork From Home\nHalf Day",
+  "allowed_attendance_statuses": "Absent",
   "auto_email_salary_slips": 0,
   "auto_reject_days": 7,
   "docstatus": 0,
