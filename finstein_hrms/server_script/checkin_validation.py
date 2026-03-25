@@ -42,10 +42,12 @@ def sync_attendance_from_checkin(doc, method=None):
 
     if existing:
         att = frappe.get_doc("Attendance", existing)
-        att.status = status
-        att.flags.ignore_validate = True
-        att.save(ignore_permissions=True)
-        if att.docstatus == 0:
+        if att.docstatus == 1:
+            frappe.db.set_value("Attendance", existing, "status", status)
+        else:
+            att.status = status
+            att.flags.ignore_validate = True
+            att.save(ignore_permissions=True)
             att.submit()
     else:
         att = frappe.new_doc("Attendance")

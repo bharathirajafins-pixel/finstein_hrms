@@ -65,12 +65,13 @@ def validate_leave_dates(doc, method=None):
                 "Please check the time fields and try again."
             )
 
-    should_check_balance = getattr(doc, "docstatus", 0) == 1 or method in (
-        "before_submit",
-        "on_submit",
-    )
-    if should_check_balance:
-        check_leave_balance(doc, settings)
+    check_leave_balance(doc, settings)
+
+
+def check_balance_before_submit(doc, method=None):
+	"""Hook for before_submit: re-check balance at submission time."""
+	settings = get_settings()
+	check_leave_balance(doc, settings)
 
 
 def check_leave_balance(doc, settings):

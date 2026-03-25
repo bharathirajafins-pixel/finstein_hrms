@@ -15,7 +15,7 @@ def _load_settings():
     """Safely load settings with a sensible fallback during setup/migration."""
     try:
         return get_settings()
-    except Exception:
+    except (frappe.DoesNotExistError, frappe.ValidationError):
         frappe.logger().warning("[MealSystem] Finstein HRMS Settings not available. Using defaults.")
         return None
 
@@ -352,7 +352,9 @@ def escalate_pending_approvals():
     """
     Send escalation reminders for pending leave and attendance approvals.
     """
-    settings = get_settings()
+    settings = _load_settings()
+    if not settings:
+        return
 
     if not settings.enable_escalation_reminders:
         return
@@ -420,6 +422,10 @@ def escalate_pending_approvals():
                 f"has been pending since {attendance.modified}. "
                 f"Please log in to ERPNext to review."
             ),
+        )
+
+        frappe.logger().info(
+            f"[Escalation] Reminder sent to {recipient} for attendance request {attendance.name}"
         )
 
     frappe.logger().info(

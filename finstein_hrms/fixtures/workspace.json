@@ -20,20 +20,7 @@
   "public": 1,
   "quick_lists": [],
   "restrict_to_domain": null,
-  "roles": [
-   {
-    "parent": "Employee Workspace",
-    "parentfield": "roles",
-    "parenttype": "Workspace",
-    "role": "Employee"
-   },
-   {
-    "parent": "Employee Workspace",
-    "parentfield": "roles",
-    "parenttype": "Workspace",
-    "role": "Administrator"
-   }
-  ],
+  "roles": [],
   "sequence_id": 40.0,
   "shortcuts": [
    {
@@ -1089,6 +1076,12 @@
     "parentfield": "roles",
     "parenttype": "Workspace",
     "role": "HR Manager"
+   },
+   {
+    "parent": "HR Workspace",
+    "parentfield": "roles",
+    "parenttype": "Workspace",
+    "role": "Head"
    },
    {
     "parent": "HR Workspace",

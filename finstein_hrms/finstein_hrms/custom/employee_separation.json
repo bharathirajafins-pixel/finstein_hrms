@@ -53,8 +53,8 @@
    "print_hide": 0,
    "print_hide_if_no_value": 0,
    "print_width": null,
-   "read_only": 1,
-   "read_only_depends_on": null,
+   "read_only": 0,
+   "read_only_depends_on": "eval:doc.workflow_state && doc.workflow_state !== 'Draft'",
    "report_hide": 0,
    "reqd": 1,
    "search_index": 0,
@@ -154,7 +154,7 @@
    "property": "field_order",
    "property_type": "Data",
    "row_name": null,
-   "value": "[\"workflow_state\", \"employee\", \"employee_name\", \"department\", \"designation\", \"employee_grade\", \"column_break_7\", \"company\", \"boarding_status\", \"resignation_letter_date\", \"boarding_begins_on\", \"project\", \"reason\", \"table_for_activity\", \"employee_separation_template\", \"activities\", \"notify_users_by_email\", \"section_break_14\", \"exit_interview\", \"amended_from\"]"
+   "value": "[\"workflow_state\", \"employee\", \"employee_name\", \"department\", \"designation\", \"employee_grade\", \"column_break_7\", \"company\", \"boarding_status\", \"resignation_letter_date\", \"boarding_begins_on\", \"project\", \"custom_reason\", \"table_for_activity\", \"employee_separation_template\", \"activities\", \"notify_users_by_email\", \"section_break_14\", \"exit_interview\", \"amended_from\"]"
   }
  ],
  "sync_on_migrate": 1

@@ -13,10 +13,7 @@ DEFAULT_TIME_WINDOWS = {
     "Lunch": {"start": time(12, 30), "end": time(15, 0)},
     "Dinner": {"start": time(19, 0), "end": time(22, 0)},
 }
-TIME_WINDOWS = DEFAULT_TIME_WINDOWS
-
-
-def _get_time_windows():
+def get_time_windows():
     """Build meal windows from settings with fallback defaults."""
     try:
         settings = get_settings()
@@ -41,7 +38,7 @@ def _get_time_windows():
 
 def _window_str(food_type):
     """Return display string for one meal window."""
-    windows = _get_time_windows()
+    windows = get_time_windows()
     window = windows.get(food_type)
     if not window:
         return ""
@@ -103,7 +100,7 @@ def scan_food_qr(qr_data):
     if qr_employee and qr_employee != employee:
         frappe.throw("This QR is assigned to another employee.")
 
-    windows = _get_time_windows()
+    windows = get_time_windows()
     window = windows.get(qr_food_type)
 
     if not window:
@@ -225,7 +222,8 @@ def withdraw_leave_application(docname):
     """
     doc = frappe.get_doc("Leave Application", docname)
 
-    if doc.owner != frappe.session.user:
+    employee_user = frappe.db.get_value("Employee", doc.employee, "user_id")
+    if employee_user != frappe.session.user:
         frappe.throw("You can only withdraw your own leave applications.")
 
     if doc.workflow_state not in ["Pending", "Pending HR Approve"]:
@@ -273,9 +271,6 @@ def cancel_meal_order(qr_name):
         )
 
     qr_doc = frappe.get_doc("Food QR", qr_name)
-
-    if getattr(qr_doc, "employee", None) and qr_doc.employee != frappe.session.user:
-        frappe.throw("You can only cancel your own meal orders.")
 
     if qr_doc.status not in ["Pending", "Scheduled"]:
         frappe.throw(
