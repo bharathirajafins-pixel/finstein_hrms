@@ -1,32 +1,29 @@
 $(document).ready(function () {
-
-    var checkReady = setInterval(function () {
-        if (
-            typeof frappe !== "undefined" &&
-            frappe.session &&
-            frappe.session.user &&
-            frappe.session.user !== "Guest"
-        ) {
-            clearInterval(checkReady);
-            initFinNotificationSidebar();
-        }
-    }, 500);
-
+	var checkReady = setInterval(function () {
+		if (
+			typeof frappe !== "undefined" &&
+			frappe.session &&
+			frappe.session.user &&
+			frappe.session.user !== "Guest"
+		) {
+			clearInterval(checkReady);
+			initFinNotificationSidebar();
+		}
+	}, 500);
 });
 
 function initFinNotificationSidebar() {
+	if (window.__fin_notif_sidebar_init) return;
+	window.__fin_notif_sidebar_init = true;
 
-    if (window.__fin_notif_sidebar_init) return;
-    window.__fin_notif_sidebar_init = true;
+	var SIDEBAR_WIDTH = 280; // Fixed sidebar width — do NOT change this
 
-    var SIDEBAR_WIDTH = 280; // Fixed sidebar width — do NOT change this
-
-    /* ══════════════════════════════════════════
+	/* ══════════════════════════════════════════
        CSS
     ══════════════════════════════════════════ */
 
-    if (!document.getElementById("fin-notif-style")) {
-        $("head").append(`
+	if (!document.getElementById("fin-notif-style")) {
+		$("head").append(`
             <style id="fin-notif-style">
 
             body {
@@ -230,14 +227,14 @@ function initFinNotificationSidebar() {
 
             </style>
         `);
-    }
+	}
 
-    /* ══════════════════════════════════════════
+	/* ══════════════════════════════════════════
        HTML
     ══════════════════════════════════════════ */
 
-    if (!document.getElementById("fin-notif-sidebar")) {
-        $("body").append(`
+	if (!document.getElementById("fin-notif-sidebar")) {
+		$("body").append(`
             <div id="fin-notif-sidebar">
                 <div class="fin-notif-header">
                     <span class="fin-notif-header-title">Notification</span>
@@ -249,63 +246,69 @@ function initFinNotificationSidebar() {
                 </div>
             </div>
         `);
-    }
+	}
 
-    /* ══════════════════════════════════════════
+	/* ══════════════════════════════════════════
        Helpers
     ══════════════════════════════════════════ */
 
-    function escapeHtml(val) {
-        return String(val || "")
-            .replace(/&/g, "&amp;")
-            .replace(/</g, "&lt;")
-            .replace(/>/g, "&gt;");
-    }
+	function escapeHtml(val) {
+		return String(val || "")
+			.replace(/&/g, "&amp;")
+			.replace(/</g, "&lt;")
+			.replace(/>/g, "&gt;");
+	}
 
-    function resolveNotificationRoute(n) {
-        if (n.document_type && n.document_name) {
-            return ["Form", n.document_type, n.document_name];
-        }
+	function resolveNotificationRoute(n) {
+		if (n.document_type && n.document_name) {
+			return ["Form", n.document_type, n.document_name];
+		}
 
-        if (n.link) {
-            var cleanLink = String(n.link).replace(/^https?:\/\/[^/]+/i, "");
-            var match =
-                cleanLink.match(/\/app\/form\/([^/]+)\/([^/?#]+)/i) ||
-                cleanLink.match(/\/app\/([^/]+)\/([^/?#]+)/i);
+		if (n.link) {
+			var cleanLink = String(n.link).replace(/^https?:\/\/[^/]+/i, "");
+			var match =
+				cleanLink.match(/\/app\/form\/([^/]+)\/([^/?#]+)/i) ||
+				cleanLink.match(/\/app\/([^/]+)\/([^/?#]+)/i);
 
-            if (match) {
-                return [
-                    "Form",
-                    decodeURIComponent(match[1]).replace(/-/g, " ").replace(/\b\w/g, function (c) { return c.toUpperCase(); }),
-                    decodeURIComponent(match[2]),
-                ];
-            }
-        }
+			if (match) {
+				return [
+					"Form",
+					decodeURIComponent(match[1])
+						.replace(/-/g, " ")
+						.replace(/\b\w/g, function (c) {
+							return c.toUpperCase();
+						}),
+					decodeURIComponent(match[2]),
+				];
+			}
+		}
 
-        return null;
-    }
+		return null;
+	}
 
-    function timeAgo(dateStr) {
-        if (!dateStr) return "just now";
-        var diff = Math.floor((Date.now() - new Date(dateStr).getTime()) / 1000);
-        if (diff < 60)    return "just now";
-        if (diff < 3600)  return Math.floor(diff / 60) + " min ago";
-        if (diff < 86400) return Math.floor(diff / 3600) + " hr ago";
-        return Math.floor(diff / 86400) + " days ago";
-    }
+	function timeAgo(dateStr) {
+		if (!dateStr) return "just now";
+		var diff = Math.floor((Date.now() - new Date(dateStr).getTime()) / 1000);
+		if (diff < 60) return "just now";
+		if (diff < 3600) return Math.floor(diff / 60) + " min ago";
+		if (diff < 86400) return Math.floor(diff / 3600) + " hr ago";
+		return Math.floor(diff / 86400) + " days ago";
+	}
 
-    function setBadge(count) {
-        $("#fin-notif-badge").text(count).attr("data-count", count);
-    }
+	function setBadge(count) {
+		$("#fin-notif-badge").text(count).attr("data-count", count);
+	}
 
-    function animateBadge() {
-        var $b = $("#fin-notif-badge");
-        $b.addClass("pop");
-        setTimeout(function () { $b.removeClass("pop"); }, 250);
-    }
+	function animateBadge() {
+		var $b = $("#fin-notif-badge");
+		$b.addClass("pop");
+		setTimeout(function () {
+			$b.removeClass("pop");
+		}, 250);
+	}
 
-    function showEmptyState() {
-        $("#fin-notif-list").html(`
+	function showEmptyState() {
+		$("#fin-notif-list").html(`
             <div class="fin-notif-empty">
                 <svg width="36" height="36" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
@@ -317,122 +320,128 @@ function initFinNotificationSidebar() {
                 All caught up!<br>No unread notifications.
             </div>
         `);
-    }
+	}
 
-    /* ══════════════════════════════════════════
+	/* ══════════════════════════════════════════
        Render
     ══════════════════════════════════════════ */
 
-    var _prevCount = 0;
+	var _prevCount = 0;
 
-    function renderNotifications(rows, isNewArrival) {
-        var $list = $("#fin-notif-list");
-        $list.empty();
-        setBadge(rows.length);
+	function renderNotifications(rows, isNewArrival) {
+		var $list = $("#fin-notif-list");
+		$list.empty();
+		setBadge(rows.length);
 
-        if (isNewArrival && rows.length > _prevCount) animateBadge();
-        _prevCount = rows.length;
+		if (isNewArrival && rows.length > _prevCount) animateBadge();
+		_prevCount = rows.length;
 
-        if (!rows.length) { showEmptyState(); return; }
+		if (!rows.length) {
+			showEmptyState();
+			return;
+		}
 
-        rows.forEach(function (n, index) {
-            var isNew = isNewArrival && index === 0;
+		rows.forEach(function (n, index) {
+			var isNew = isNewArrival && index === 0;
 
-            var $item = $(`
+			var $item = $(`
                 <div class="fin-notif-item ${isNew ? "new-flash" : ""}">
                     <div class="fin-notif-title">${escapeHtml(n.subject || "Notification")}</div>
                     <div class="fin-notif-meta">${timeAgo(n.creation)}</div>
                 </div>
             `);
 
-            $item.on("click", function () {
-                var route = resolveNotificationRoute(n);
+			$item.on("click", function () {
+				var route = resolveNotificationRoute(n);
 
-                if (route) {
-                    frappe.set_route.apply(frappe, route);
-                } else {
-                    frappe.set_route("Form", "Notification Log", n.name);
-                }
+				if (route) {
+					frappe.set_route.apply(frappe, route);
+				} else {
+					frappe.set_route("Form", "Notification Log", n.name);
+				}
 
-                frappe.call({
-                    method: "frappe.desk.doctype.notification_log.notification_log.mark_as_read",
-                    args: { docname: n.name },
-                    callback: function () {
-                        $item.slideUp(180, function () {
-                            $item.remove();
-                            _prevCount = Math.max(0, _prevCount - 1);
-                            setBadge(_prevCount);
-                            if (_prevCount === 0) showEmptyState();
-                        });
-                    }
-                });
-            });
+				frappe.call({
+					method: "frappe.desk.doctype.notification_log.notification_log.mark_as_read",
+					args: { docname: n.name },
+					callback: function () {
+						$item.slideUp(180, function () {
+							$item.remove();
+							_prevCount = Math.max(0, _prevCount - 1);
+							setBadge(_prevCount);
+							if (_prevCount === 0) showEmptyState();
+						});
+					},
+				});
+			});
 
-            $list.append($item);
-        });
-    }
+			$list.append($item);
+		});
+	}
 
-    /* ══════════════════════════════════════════
+	/* ══════════════════════════════════════════
        Fetch — UNREAD ONLY
     ══════════════════════════════════════════ */
 
-    function fetchNotifications(isNewArrival) {
-        frappe.call({
-            method: "frappe.client.get_list",
-            args: {
-                doctype: "Notification Log",
-                filters: { for_user: frappe.session.user, read: 0 },
-                fields: ["name", "subject", "document_type", "document_name", "link", "creation"],
-                order_by: "creation desc",
-                limit_page_length: 50
-            },
-            callback: function (r) {
-                renderNotifications(r.message || [], isNewArrival || false);
-            }
-        });
-    }
+	function fetchNotifications(isNewArrival) {
+		frappe.call({
+			method: "frappe.client.get_list",
+			args: {
+				doctype: "Notification Log",
+				filters: { for_user: frappe.session.user, read: 0 },
+				fields: ["name", "subject", "document_type", "document_name", "link", "creation"],
+				order_by: "creation desc",
+				limit_page_length: 50,
+			},
+			callback: function (r) {
+				renderNotifications(r.message || [], isNewArrival || false);
+			},
+		});
+	}
 
-    /* ══════════════════════════════════════════
+	/* ══════════════════════════════════════════
        Mark All as Read
     ══════════════════════════════════════════ */
 
-    $(document).on("click", "#fin-notif-mark-all", function () {
-        frappe.call({
-            method: "frappe.client.get_list",
-            args: {
-                doctype: "Notification Log",
-                filters: { for_user: frappe.session.user, read: 0 },
-                fields: ["name"],
-                limit_page_length: 100
-            },
-            callback: function (r) {
-                var unread = r.message || [];
-                if (!unread.length) return;
-                var done = 0;
-                unread.forEach(function (n) {
-                    frappe.call({
-                        method: "frappe.desk.doctype.notification_log.notification_log.mark_as_read",
-                        args: { docname: n.name },
-                        callback: function () {
-                            done++;
-                            if (done === unread.length) fetchNotifications(false);
-                        }
-                    });
-                });
-            }
-        });
-    });
+	$(document).on("click", "#fin-notif-mark-all", function () {
+		frappe.call({
+			method: "frappe.client.get_list",
+			args: {
+				doctype: "Notification Log",
+				filters: { for_user: frappe.session.user, read: 0 },
+				fields: ["name"],
+				limit_page_length: 100,
+			},
+			callback: function (r) {
+				var unread = r.message || [];
+				if (!unread.length) return;
+				var done = 0;
+				unread.forEach(function (n) {
+					frappe.call({
+						method: "frappe.desk.doctype.notification_log.notification_log.mark_as_read",
+						args: { docname: n.name },
+						callback: function () {
+							done++;
+							if (done === unread.length) fetchNotifications(false);
+						},
+					});
+				});
+			},
+		});
+	});
 
-    /* ══════════════════════════════════════════
+	/* ══════════════════════════════════════════
        Init + Realtime
     ══════════════════════════════════════════ */
 
-    fetchNotifications(false);
+	fetchNotifications(false);
 
-    setInterval(function () { fetchNotifications(false); }, 60000);
+	setInterval(function () {
+		fetchNotifications(false);
+	}, 60000);
 
-    frappe.realtime.on("notification", function () {
-        setTimeout(function () { fetchNotifications(true); }, 300);
-    });
-
+	frappe.realtime.on("notification", function () {
+		setTimeout(function () {
+			fetchNotifications(true);
+		}, 300);
+	});
 }
