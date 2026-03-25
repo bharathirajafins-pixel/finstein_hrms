@@ -26,3 +26,15 @@ def add_navbar_data(bootinfo):
         "show_calendar": True,
         "show_datetime": True,
     }
+
+    # Filter workspace sidebar for pure Employee users
+    roles = frappe.get_roles()
+    privileged_roles = {"HR Manager", "Head", "System Manager", "Administrator", "Workspace Manager"}
+
+    if "Employee" in roles and not privileged_roles.intersection(roles):
+        allowed = {"Employee Workspace"}
+        if hasattr(bootinfo, "allowed_workspaces") and bootinfo.allowed_workspaces:
+            bootinfo.allowed_workspaces = [
+                ws for ws in bootinfo.allowed_workspaces
+                if ws.get("name") in allowed or ws.get("title") in allowed
+            ]

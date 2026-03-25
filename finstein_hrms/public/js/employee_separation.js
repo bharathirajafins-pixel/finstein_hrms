@@ -6,6 +6,9 @@ frappe.ui.form.on('Employee Separation', {
 
     refresh(frm) {
         auto_fill_employee(frm);
+        if (frm.is_new() || frm.doc.workflow_state === "Draft") {
+            frm.set_df_property("custom_reason", "read_only", 0);
+        }
     }
 
 });

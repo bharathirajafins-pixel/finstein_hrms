@@ -123,7 +123,7 @@ class TestFoodQR(FrappeTestCase):
         with patch("finstein_hrms.api.now_datetime") as mocked_now:
             from datetime import datetime
 
-            mocked_now.return_value = datetime.combine(getdate(self.today), api.TIME_WINDOWS["Breakfast"]["start"])
+            mocked_now.return_value = datetime.combine(getdate(self.today), api.DEFAULT_TIME_WINDOWS["Breakfast"]["start"])
             result = api.scan_food_qr(qr_doc.qr_data)
 
         updated = frappe.get_doc(
@@ -146,6 +146,6 @@ class TestFoodQR(FrappeTestCase):
         with patch("finstein_hrms.api.now_datetime") as mocked_now:
             from datetime import datetime
 
-            mocked_now.return_value = datetime.combine(getdate(self.today), api.TIME_WINDOWS["Breakfast"]["start"])
+            mocked_now.return_value = datetime.combine(getdate(self.today), api.DEFAULT_TIME_WINDOWS["Breakfast"]["start"])
             with self.assertRaises(frappe.ValidationError):
                 api.scan_food_qr(qr_doc.qr_data)

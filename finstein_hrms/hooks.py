@@ -46,6 +46,7 @@ doc_events = {
     },
     "Leave Application": {
         "validate": "finstein_hrms.server_script.leave_validation.validate_leave_dates",
+        "before_submit": "finstein_hrms.server_script.leave_validation.check_balance_before_submit",
     },
     "Employee Checkin": {
         "before_save": "finstein_hrms.server_script.checkin_validation.validate_checkin",
@@ -88,6 +89,8 @@ doctype_js = {
     "Interview": "public/js/interview.js",
     "Payroll Entry": "public/js/payroll_entry.js",
 }
+
+boot_session = "finstein_hrms.boot.add_navbar_data"
 
 app_include_js = [
     "assets/finstein_hrms/js/fin_notification_sidebar.js?v=2",
