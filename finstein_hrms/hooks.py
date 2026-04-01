@@ -69,6 +69,9 @@ doc_events = {
 	"Expense Claim": {
 		"validate": "finstein_hrms.server_script.expense_claim_validation.validate_expense_claim_update",
 	},
+	"Timesheet": {
+		"validate": "finstein_hrms.server_script.timesheet_validation.mark_employee_saved_draft",
+	},
 }
 
 scheduler_events = {
@@ -96,6 +99,10 @@ doctype_js = {
 	"Expense Claim": "public/js/expense_claim.js",
 	"Interview": "public/js/interview.js",
 	"Payroll Entry": "public/js/payroll_entry.js",
+}
+
+doctype_list_js = {
+	"Timesheet": "public/js/timesheet_list.js",
 }
 
 boot_session = "finstein_hrms.boot.add_navbar_data"
