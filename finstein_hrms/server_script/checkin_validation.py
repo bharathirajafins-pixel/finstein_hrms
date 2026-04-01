@@ -86,6 +86,8 @@ def ensure_timesheet_for_checkin(checkin_name):
 	ts.employee = doc.employee
 	ts.start_date = getdate(doc.time)
 	ts.end_date = getdate(doc.time)
+	if frappe.get_meta("Timesheet").has_field("employee_saved_draft"):
+		ts.employee_saved_draft = 0
 	ts.append(
 		"time_logs",
 		{
