@@ -1,172 +1,162 @@
 from datetime import timedelta
 
 import frappe
-from frappe.utils import add_months, add_days, getdate, today
+from frappe.utils import add_days, add_months, getdate, today
 
 from finstein_hrms.finstein_hrms.doctype.finstein_hrms_settings.finstein_hrms_settings import (
-    get_settings,
+	get_settings,
 )
 
 
 def validate(doc, method=None):
-    """Bridge validate hook for Attendance Request."""
-    validate_attendance_request(doc, method)
+	"""Bridge validate hook for Attendance Request."""
+	validate_attendance_request(doc, method)
 
 
 def validate_attendance_request(doc, method=None):
-    """Validate attendance correction request against policy."""
-    _set_attendance_request_approver(doc)
+	"""Validate attendance correction request against policy."""
+	_set_attendance_request_approver(doc)
 
-    settings = get_settings()
-    max_req = settings.max_attendance_requests_per_month or 5
-    curr_only = settings.restrict_to_current_month
-    allowed_raw = settings.allowed_attendance_statuses or ""
-    allowed = [status.strip() for status in allowed_raw.splitlines() if status.strip()]
+	settings = get_settings()
+	max_req = settings.max_attendance_requests_per_month or 5
+	curr_only = settings.restrict_to_current_month
+	allowed_raw = settings.allowed_attendance_statuses or ""
+	allowed = [status.strip() for status in allowed_raw.splitlines() if status.strip()]
 
-    from_date = getdate(doc.from_date)
-    to_date = getdate(doc.to_date)
-    current_date = getdate(today())
+	from_date = getdate(doc.from_date)
+	to_date = getdate(doc.to_date)
+	current_date = getdate(today())
 
-    if from_date > to_date:
-        frappe.throw("From Date cannot be after To Date.")
+	if from_date > to_date:
+		frappe.throw("From Date cannot be after To Date.")
 
-    check_attendance_not_locked(doc)
+	check_attendance_not_locked(doc)
 
-    if from_date >= current_date or to_date >= current_date:
-        frappe.throw(
-            "Attendance Request is allowed only for past dates. "
-            "Today and future dates are not permitted."
-        )
+	if from_date >= current_date or to_date >= current_date:
+		frappe.throw(
+			"Attendance Request is allowed only for past dates. Today and future dates are not permitted."
+		)
 
-    if curr_only and (
-        from_date.month != current_date.month
-        or from_date.year != current_date.year
-        or to_date.month != current_date.month
-        or to_date.year != current_date.year
-    ):
-        frappe.throw(
-            "Attendance Request is restricted to the current month only. "
-            "Please contact HR for older date corrections."
-        )
+	if curr_only and (
+		from_date.month != current_date.month
+		or from_date.year != current_date.year
+		or to_date.month != current_date.month
+		or to_date.year != current_date.year
+	):
+		frappe.throw(
+			"Attendance Request is restricted to the current month only. "
+			"Please contact HR for older date corrections."
+		)
 
-    month_start = current_date.replace(day=1)
-    month_end = add_days(add_months(month_start, 1), -1)
+	month_start = current_date.replace(day=1)
+	month_end = add_days(add_months(month_start, 1), -1)
 
-    existing_requests = frappe.db.count(
-        "Attendance Request",
-        filters=[
-            ["employee", "=", doc.employee],
-            ["from_date", ">=", month_start],
-            ["from_date", "<=", month_end],
-            ["docstatus", "!=", 2],
-            ["name", "!=", doc.name],
-        ],
-    )
+	existing_requests = frappe.db.count(
+		"Attendance Request",
+		filters=[
+			["employee", "=", doc.employee],
+			["from_date", ">=", month_start],
+			["from_date", "<=", month_end],
+			["docstatus", "!=", 2],
+			["name", "!=", doc.name],
+		],
+	)
 
-    if existing_requests >= max_req:
-        frappe.throw(
-            f"You have already submitted {existing_requests} attendance request(s) "
-            f"this month. Maximum allowed is {max_req}."
-        )
+	if existing_requests >= max_req:
+		frappe.throw(
+			f"You have already submitted {existing_requests} attendance request(s) "
+			f"this month. Maximum allowed is {max_req}."
+		)
 
-    # Some deployments use attendance_type on the request itself.
-    request_status = getattr(doc, "attendance_type", None)
-    if request_status:
-        if allowed and request_status not in allowed:
-            allowed_display = ", ".join(allowed)
-            frappe.throw(
-                f"Attendance Request is only allowed for these statuses: "
-                f"{allowed_display}. Found '{request_status}'."
-            )
-        return
+	# Some deployments use attendance_type on the request itself.
+	request_status = getattr(doc, "attendance_type", None)
+	if request_status:
+		if allowed and request_status not in allowed:
+			allowed_display = ", ".join(allowed)
+			frappe.throw(
+				f"Attendance Request is only allowed for these statuses: "
+				f"{allowed_display}. Found '{request_status}'."
+			)
+		return
 
-    for check_date in _date_range(from_date, to_date):
-        attendance = frappe.db.get_value(
-            "Attendance",
-            {
-                "employee": doc.employee,
-                "attendance_date": check_date,
-                "docstatus": 1,
-            },
-            ["status", "name", "custom_locked"],
-            as_dict=True,
-        )
+	for check_date in _date_range(from_date, to_date):
+		attendance = frappe.db.get_value(
+			"Attendance",
+			{
+				"employee": doc.employee,
+				"attendance_date": check_date,
+				"docstatus": 1,
+			},
+			["status", "name", "custom_locked"],
+			as_dict=True,
+		)
 
-        if not attendance:
-            frappe.throw(
-                f"No submitted Attendance record was found for {check_date}. "
-                "Please contact HR."
-            )
+		if not attendance:
+			frappe.throw(f"No submitted Attendance record was found for {check_date}. Please contact HR.")
 
-        if attendance.custom_locked:
-            frappe.throw(
-                "Attendance for this date is locked because payroll has already "
-                "been processed for this period. Please contact HR if a "
-                "correction is needed."
-            )
+		if attendance.custom_locked:
+			frappe.throw(
+				"Attendance for this date is locked because payroll has already "
+				"been processed for this period. Please contact HR if a "
+				"correction is needed."
+			)
 
-        if allowed and attendance.status not in allowed:
-            if allowed == ["Absent"]:
-                frappe.throw(
-                    f"Attendance Request can only be raised for Absent days. "
-                    f"Found '{attendance.status}' on {check_date}."
-                )
-
-            allowed_display = ", ".join(allowed)
-            frappe.throw(
-                f"Attendance Request is only allowed for these statuses: "
-                f"{allowed_display}. Found '{attendance.status}' on {check_date}."
-            )
+		if allowed and attendance.status not in allowed:
+			allowed_display = ", ".join(allowed)
+			frappe.throw(
+				f"Attendance Request is only allowed for these statuses: "
+				f"{allowed_display}. Found '{attendance.status}' on {check_date}."
+			)
 
 
 def check_attendance_not_locked(doc):
-    """
-    Block attendance correction requests if any date in the request range is locked.
-    """
-    from_date = getdate(doc.from_date)
-    to_date = getdate(doc.to_date)
+	"""
+	Block attendance correction requests if any date in the request range is locked.
+	"""
+	from_date = getdate(doc.from_date)
+	to_date = getdate(doc.to_date)
 
-    for check_date in _date_range(from_date, to_date):
-        locked = frappe.db.get_value(
-            "Attendance",
-            {
-                "employee": doc.employee,
-                "attendance_date": check_date,
-            },
-            "custom_locked",
-        )
-        if locked:
-            frappe.throw(
-                "Attendance for this date is locked because payroll has already "
-                "been processed for this period. Please contact HR if a "
-                "correction is needed."
-            )
+	for check_date in _date_range(from_date, to_date):
+		locked = frappe.db.get_value(
+			"Attendance",
+			{
+				"employee": doc.employee,
+				"attendance_date": check_date,
+			},
+			"custom_locked",
+		)
+		if locked:
+			frappe.throw(
+				"Attendance for this date is locked because payroll has already "
+				"been processed for this period. Please contact HR if a "
+				"correction is needed."
+			)
 
 
 def _set_attendance_request_approver(doc):
-    """Map attendance requests to the employee's assigned TL."""
-    employee_user = frappe.db.get_value("Employee", doc.employee, "user_id")
-    doc.approver = frappe.db.get_value("Employee", doc.employee, "shift_request_approver")
+	"""Map attendance requests to the employee's assigned TL."""
+	employee_user = frappe.db.get_value("Employee", doc.employee, "user_id")
+	doc.approver = frappe.db.get_value("Employee", doc.employee, "shift_request_approver")
 
-    is_team_leader = bool(
-        employee_user
-        and frappe.db.get_value(
-            "Has Role",
-            {"parent": employee_user, "parenttype": "User", "role": "Team Leader"},
-            "name",
-        )
-    )
+	is_team_leader = bool(
+		employee_user
+		and frappe.db.get_value(
+			"Has Role",
+			{"parent": employee_user, "parenttype": "User", "role": "Team Leader"},
+			"name",
+		)
+	)
 
-    if not is_team_leader and doc.workflow_state == "Pending" and not doc.approver:
-        frappe.throw(
-            "Shift Request Approver is not set for this employee. "
-            "Please contact HR to assign the Team Leader before submitting the request."
-        )
+	if not is_team_leader and doc.workflow_state == "Pending" and not doc.approver:
+		frappe.throw(
+			"Shift Request Approver is not set for this employee. "
+			"Please contact HR to assign the Team Leader before submitting the request."
+		)
 
 
 def _date_range(start_date, end_date):
-    """Yield all dates between start_date and end_date (inclusive)."""
-    current = start_date
-    while current <= end_date:
-        yield current
-        current += timedelta(days=1)
+	"""Yield all dates between start_date and end_date (inclusive)."""
+	current = start_date
+	while current <= end_date:
+		yield current
+		current += timedelta(days=1)
