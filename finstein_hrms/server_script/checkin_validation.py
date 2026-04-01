@@ -2,7 +2,7 @@
 
 import frappe
 from frappe import _
-from frappe.utils import get_datetime, get_time, getdate, time_diff_in_hours
+from frappe.utils import flt, get_datetime, get_time, getdate, time_diff_in_hours
 
 from finstein_hrms.finstein_hrms.doctype.finstein_hrms_settings.finstein_hrms_settings import (
 	get_settings,
@@ -21,10 +21,15 @@ def validate_checkin(doc, method=None):
 	_min_hours(doc, settings)
 	_calc_hours(doc)
 	_set_status(doc, settings)
+	_validate_timesheet_submission_before_checkout(doc)
 
 
 def sync_attendance_from_checkin(doc, method=None):
 	"""Create or update Attendance once check-out is completed."""
+	if doc.employee and doc.time and not doc.checkout_time:
+		ensure_timesheet_for_checkin(doc.name)
+		return
+
 	if not (doc.employee and doc.time and doc.checkout_time):
 		return
 
@@ -60,6 +65,55 @@ def sync_attendance_from_checkin(doc, method=None):
 
 	tag_attendance_anomalies(doc)
 	calculate_and_store_overtime(doc.employee, attendance_date, float(doc.working_hours or 0))
+
+
+@frappe.whitelist()
+def ensure_timesheet_for_checkin(checkin_name):
+	"""Create and link a draft Timesheet for an Employee Checkin if missing."""
+	if not checkin_name:
+		frappe.throw(_("Employee Checkin is required."))
+
+	doc = frappe.get_doc("Employee Checkin", checkin_name)
+	if getattr(doc, "timesheet", None):
+		payload = _get_timesheet_payload(doc.timesheet)
+		if payload["docstatus"] != 2:
+			return payload
+
+	if not (doc.employee and doc.time):
+		frappe.throw(_("Check-In must be saved before creating a timesheet."))
+
+	ts = frappe.new_doc("Timesheet")
+	ts.employee = doc.employee
+	ts.start_date = getdate(doc.time)
+	ts.end_date = getdate(doc.time)
+	ts.append(
+		"time_logs",
+		{
+			"from_time": doc.time,
+			"to_time": doc.time,
+			"hours": 0,
+		},
+	)
+	ts.insert(ignore_permissions=True)
+
+	frappe.db.set_value("Employee Checkin", doc.name, "timesheet", ts.name, update_modified=False)
+	return {"timesheet": ts.name, "docstatus": ts.docstatus}
+
+
+@frappe.whitelist()
+def validate_timesheet_before_checkout(checkin_name):
+	"""Return linked Timesheet readiness for the checkout UI flow."""
+	if not checkin_name:
+		frappe.throw(_("Employee Checkin is required."))
+
+	doc = frappe.get_doc("Employee Checkin", checkin_name)
+	if not getattr(doc, "timesheet", None):
+		return {"ready": False, "timesheet": None, "message": _timesheet_required_message()}
+
+	payload = _get_timesheet_payload(doc.timesheet)
+	payload["ready"] = _is_timesheet_ready_for_checkout(doc.timesheet)
+	payload["message"] = None if payload["ready"] else _timesheet_required_message()
+	return payload
 
 
 def tag_attendance_anomalies(doc):
@@ -271,3 +325,58 @@ def _set_status(doc, settings):
 		doc.attendance_status = "Half Day"
 	else:
 		doc.attendance_status = "Absent"
+
+
+def _validate_timesheet_submission_before_checkout(doc):
+	"""Require a completed saved or submitted linked timesheet before checkout."""
+	if not doc.checkout_time:
+		return
+
+	timesheet_name = getattr(doc, "timesheet", None)
+	if not timesheet_name:
+		frappe.throw(_timesheet_required_message())
+
+	if not _is_timesheet_ready_for_checkout(timesheet_name):
+		frappe.throw(_timesheet_required_message())
+
+
+def _timesheet_required_message():
+	return _("Please complete and save your timesheet before checking out.")
+
+
+def _get_timesheet_payload(timesheet_name):
+	"""Return lightweight Timesheet status payload for client flow control."""
+	ts = frappe.db.get_value("Timesheet", timesheet_name, ["name", "docstatus"], as_dict=True)
+	if not ts:
+		return {"timesheet": timesheet_name, "docstatus": 2}
+
+	return {"timesheet": ts.name, "docstatus": ts.docstatus}
+
+
+def _is_timesheet_ready_for_checkout(timesheet_name):
+	"""Allow checkout when linked timesheet is saved/submitted with meaningful rows."""
+	if not timesheet_name:
+		return False
+
+	try:
+		ts = frappe.get_doc("Timesheet", timesheet_name)
+	except frappe.DoesNotExistError:
+		return False
+
+	if ts.docstatus == 2:
+		return False
+
+	return _has_checkout_ready_time_logs(ts)
+
+
+def _has_checkout_ready_time_logs(timesheet):
+	"""A draft Timesheet is checkout-ready once at least one real row has Activity Type."""
+	for row in timesheet.get("time_logs") or []:
+		has_any_data = bool(row.activity_type or row.from_time or row.to_time or flt(row.hours))
+		if not has_any_data:
+			continue
+
+		if row.activity_type and row.from_time:
+			return True
+
+	return False

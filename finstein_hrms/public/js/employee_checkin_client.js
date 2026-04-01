@@ -12,6 +12,7 @@ frappe.ui.form.on("Employee Checkin", {
 	},
 
 	refresh(frm) {
+		_hide_fetch_shift_button(frm);
 		_hide_fields(frm);
 		frm.disable_save();
 		_clear_our_buttons(frm);
@@ -195,6 +196,9 @@ function _hide_fields(frm) {
 		"section_break_7",
 		"section_break_9",
 		"column_break_8",
+		"break_start",
+		"break_end",
+		"break_hours",
 	];
 	HIDE.forEach((fn) => {
 		if (frm.fields_dict[fn]) frm.set_df_property(fn, "hidden", 1);
@@ -209,6 +213,7 @@ function _hide_fields(frm) {
 		"checkout_type",
 		"log_type",
 		"log_type_out",
+		"timesheet",
 	].forEach((fn) => {
 		if (frm.fields_dict[fn]) frm.set_df_property(fn, "description", "");
 	});
@@ -227,9 +232,7 @@ function _hide_fields(frm) {
 		"checkout_time",
 		"log_type_out",
 		"checkout_type",
-		"break_start",
-		"break_end",
-		"break_hours",
+		"timesheet",
 	].forEach((fn) => {
 		if (frm.fields_dict[fn]) frm.set_df_property(fn, "hidden", hasCheckout ? 0 : 1);
 	});
@@ -262,40 +265,66 @@ function _do_checkin(frm) {
 		frappe.throw(__("Employee not linked. Contact HR."));
 		return;
 	}
+
+	const previousTime = frm.doc.time;
+	const previousLogType = frm.doc.log_type;
 	const now = frappe.datetime.now_datetime();
 	frm.set_value("time", now);
 	frm.set_value("log_type", "IN");
-	frm.save("Save").then(() => {
-		frappe.show_alert(
-			{
-				message: __("✅ Checked In at {0}", [frappe.datetime.str_to_user(now)]),
-				indicator: "green",
-			},
-			5
-		);
-		frm.refresh();
-	});
+	frm.save("Save")
+		.then(() => frm.reload_doc())
+		.then(() => {
+			const timesheetName = frm.doc.timesheet;
+			const message = timesheetName
+				? __("Checked In at {0}. Draft Timesheet {1} created.", [
+						frappe.datetime.str_to_user(now),
+						timesheetName,
+				  ])
+				: __("Checked In at {0}", [frappe.datetime.str_to_user(now)]);
+
+			frappe.show_alert(
+				{
+					message,
+					indicator: "green",
+				},
+				5
+			);
+			frm.refresh();
+		})
+		.catch(() => {
+			frm.doc.time = previousTime || null;
+			frm.doc.log_type = previousLogType || null;
+			frm.refresh_fields(["time", "log_type"]);
+			frm.refresh();
+		});
 }
 
 function _do_checkout(frm, isForce = false) {
-	const name = frm.doc.employee_name || frm.doc.employee;
-	const totalHrs = _elapsed_hrs(frm.doc.time);
-	const breakHrs = parseFloat(frm.doc.break_hours || 0);
-	const netHrs = parseFloat(Math.max(totalHrs - breakHrs, 0).toFixed(2));
+	_validate_timesheet_ready(frm).then((result) => {
+		if (!result.ready) {
+			_show_timesheet_required_popup(result.timesheet || frm.doc.timesheet);
+			return;
+		}
 
-	if (!isForce && netHrs < 8) {
-		_show_early_checkout_dialog(frm, name, netHrs);
-		return;
-	}
+		const name = frm.doc.employee_name || frm.doc.employee;
+		const totalHrs = _elapsed_hrs(frm.doc.time);
+		const breakHrs = parseFloat(frm.doc.break_hours || 0);
+		const netHrs = parseFloat(Math.max(totalHrs - breakHrs, 0).toFixed(2));
 
-	const msg = isForce
-		? __(
-				"Force Checkout for <b>{0}</b>?<br>Status will be calculated based on worked hours.",
-				[name]
-		  )
-		: __("Confirm Check Out for <b>{0}</b>?<br><b>{1} hrs</b> completed.", [name, netHrs]);
+		if (!isForce && netHrs < 8) {
+			_show_early_checkout_dialog(frm, name, netHrs);
+			return;
+		}
 
-	frappe.confirm(msg, () => _complete_checkout(frm, { isForce, netHrs }));
+		const msg = isForce
+			? __(
+					"Force Checkout for <b>{0}</b>?<br>Status will be calculated based on worked hours.",
+					[name]
+			  )
+			: __("Confirm Check Out for <b>{0}</b>?<br><b>{1} hrs</b> completed.", [name, netHrs]);
+
+		frappe.confirm(msg, () => _complete_checkout(frm, { isForce, netHrs }));
+	});
 }
 
 function _show_early_checkout_dialog(frm, name, netHrs) {
@@ -454,6 +483,16 @@ function _clear_our_buttons(frm) {
 	].forEach((label) => frm.remove_custom_button(__(label)));
 }
 
+function _hide_fetch_shift_button(frm) {
+	const removeFetchShift = () => {
+		frm.remove_custom_button(__("Fetch Shift"));
+		frm.page.remove_inner_button?.(__("Fetch Shift"));
+	};
+
+	removeFetchShift();
+	setTimeout(removeFetchShift, 0);
+}
+
 function _prepare_new_checkin_form(frm) {
 	if (frm.__new_checkin_prepared) return;
 
@@ -468,6 +507,7 @@ function _prepare_new_checkin_form(frm) {
 		"working_hours",
 		"attendance_status",
 		"checkout_type",
+		"timesheet",
 	].forEach((fieldname) => {
 		if (fieldname in frm.doc) {
 			frm.doc[fieldname] = null;
@@ -484,4 +524,27 @@ function _can_use_self_checkin() {
 	return !["System Manager", "HR Manager", "HR User", "Head"].some((role) =>
 		frappe.user.has_role(role)
 	);
+}
+
+function _validate_timesheet_ready(frm) {
+	return frappe.call({
+		method: "finstein_hrms.server_script.checkin_validation.validate_timesheet_before_checkout",
+		args: { checkin_name: frm.doc.name },
+	}).then((r) => r.message || { ready: false, timesheet: frm.doc.timesheet || null });
+}
+
+function _show_timesheet_required_popup(timesheetName) {
+	frappe.msgprint({
+		title: __("Timesheet Required"),
+		message: __("Please complete and save your timesheet before checking out."),
+		indicator: "orange",
+		primary_action: timesheetName
+			? {
+					label: __("Open Timesheet"),
+					action() {
+						frappe.set_route("Form", "Timesheet", timesheetName);
+					},
+			  }
+			: undefined,
+	});
 }

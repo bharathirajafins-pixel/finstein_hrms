@@ -66,6 +66,9 @@ doc_events = {
 	"Employee Separation": {
 		"on_update": "finstein_hrms.server_script.employee_separation_validation.on_update",
 	},
+	"Expense Claim": {
+		"validate": "finstein_hrms.server_script.expense_claim_validation.validate_expense_claim_update",
+	},
 }
 
 scheduler_events = {
@@ -86,6 +89,7 @@ scheduler_events = {
 
 doctype_js = {
 	"Employee Checkin": "public/js/employee_checkin_client.js",
+	"Timesheet": "public/js/timesheet.js",
 	"Leave Application": "public/js/leave_application.js",
 	"Employee Separation": "public/js/employee_separation.js",
 	"Attendance Request": "public/js/attendance_request.js",
