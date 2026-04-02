@@ -1,6 +1,7 @@
+from unittest.mock import MagicMock, patch
+
 import frappe
 from frappe.tests.utils import FrappeTestCase
-from unittest.mock import patch, MagicMock
 
 
 class TestEmployeeSeparation(FrappeTestCase):

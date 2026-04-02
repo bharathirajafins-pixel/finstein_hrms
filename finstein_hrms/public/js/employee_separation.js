@@ -1,16 +1,14 @@
-frappe.ui.form.on('Employee Separation', {
+frappe.ui.form.on("Employee Separation", {
+	onload(frm) {
+		auto_fill_employee(frm);
+	},
 
-    onload(frm) {
-        auto_fill_employee(frm);
-    },
-
-    refresh(frm) {
-        auto_fill_employee(frm);
-        if (frm.is_new() || frm.doc.workflow_state === "Draft") {
-            frm.set_df_property("custom_reason", "read_only", 0);
-        }
-    }
-
+	refresh(frm) {
+		auto_fill_employee(frm);
+		if (frm.is_new() || frm.doc.workflow_state === "Draft") {
+			frm.set_df_property("custom_reason", "read_only", 0);
+		}
+	},
 });
 
 function auto_fill_employee(frm) {
