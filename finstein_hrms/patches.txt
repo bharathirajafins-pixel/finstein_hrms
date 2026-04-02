@@ -6,3 +6,4 @@
 # Patches added in this section will be executed after doctypes are migrated
 finstein_hrms.patches.ensure_hr_email_templates
 finstein_hrms.patches.set_hr_notification_templates
+finstein_hrms.patches.migrate_employee_separation_workflow_states

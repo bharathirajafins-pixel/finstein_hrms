@@ -44,34 +44,29 @@ fixtures = [
 ]
 
 doc_events = {
-	"Food Count": {
-		"after_insert": "finstein_hrms.scheduled_tasks.update_food_qr_count",
-		"on_update": "finstein_hrms.scheduled_tasks.update_food_qr_count",
-	},
-	"Leave Application": {
-		"validate": "finstein_hrms.server_script.leave_validation.validate_leave_dates",
-		"before_submit": "finstein_hrms.server_script.leave_validation.check_balance_before_submit",
-	},
-	"Employee Checkin": {
-		"before_save": "finstein_hrms.server_script.checkin_validation.validate_checkin",
-		"after_insert": "finstein_hrms.server_script.checkin_validation.sync_attendance_from_checkin",
-		"on_update": "finstein_hrms.server_script.checkin_validation.sync_attendance_from_checkin",
-	},
-	"Attendance Request": {
-		"validate": "finstein_hrms.server_script.attendance_request_validation.validate_attendance_request",
-	},
-	"Interview": {
-		"validate": "finstein_hrms.server_script.interview_round.validate_interview_scheduling",
-	},
-	"Employee Separation": {
-		"on_update": "finstein_hrms.server_script.employee_separation_validation.on_update",
-	},
-	"Expense Claim": {
-		"validate": "finstein_hrms.server_script.expense_claim_validation.validate_expense_claim_update",
-	},
-	"Timesheet": {
-		"validate": "finstein_hrms.server_script.timesheet_validation.mark_employee_saved_draft",
-	},
+    "Food Count": {
+        "after_insert": "finstein_hrms.scheduled_tasks.update_food_qr_count",
+        "on_update": "finstein_hrms.scheduled_tasks.update_food_qr_count",
+    },
+    "Leave Application": {
+        "validate": "finstein_hrms.server_script.leave_validation.validate_leave_dates",
+        "before_submit": "finstein_hrms.server_script.leave_validation.check_balance_before_submit",
+    },
+    "Employee Checkin": {
+        "before_save": "finstein_hrms.server_script.checkin_validation.validate_checkin",
+        "after_insert": "finstein_hrms.server_script.checkin_validation.sync_attendance_from_checkin",
+        "on_update": "finstein_hrms.server_script.checkin_validation.sync_attendance_from_checkin",
+    },
+    "Attendance Request": {
+        "validate": "finstein_hrms.server_script.attendance_request_validation.validate_attendance_request",
+    },
+    "Interview": {
+        "validate": "finstein_hrms.server_script.interview_round.validate_interview_scheduling",
+    },
+    "Employee Separation": {
+        "validate": "finstein_hrms.server_script.employee_separation_validation.validate",
+        "on_update": "finstein_hrms.server_script.employee_separation_validation.on_update",
+    },
 }
 
 scheduler_events = {

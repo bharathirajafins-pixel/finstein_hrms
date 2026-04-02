@@ -74,6 +74,33 @@
  {
   "docstatus": 0,
   "doctype": "Workflow State",
+  "icon": "",
+  "modified": "2026-04-01 00:00:00.000000",
+  "name": "Pending TL Approval",
+  "style": "",
+  "workflow_state_name": "Pending TL Approval"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "Workflow State",
+  "icon": "",
+  "modified": "2026-04-01 00:00:00.000000",
+  "name": "Pending CEO Approval",
+  "style": "",
+  "workflow_state_name": "Pending CEO Approval"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "Workflow State",
+  "icon": "",
+  "modified": "2026-04-01 00:00:00.000000",
+  "name": "Pending HR Approval",
+  "style": "",
+  "workflow_state_name": "Pending HR Approval"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "Workflow State",
   "icon": "ok-sign",
   "modified": "2026-02-18 15:56:24.729577",
   "name": "Approved",
