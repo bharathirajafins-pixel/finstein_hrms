@@ -60,6 +60,7 @@ doc_events = {
         "validate": "finstein_hrms.server_script.interview_round.validate_interview_scheduling",
     },
     "Employee Separation": {
+        "validate": "finstein_hrms.server_script.employee_separation_validation.validate",
         "on_update": "finstein_hrms.server_script.employee_separation_validation.on_update",
     },
 }

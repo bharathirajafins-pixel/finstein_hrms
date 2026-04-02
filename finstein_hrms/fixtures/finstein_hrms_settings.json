@@ -23,7 +23,6 @@
   "enable_overtime_tracking": 1,
   "enable_payroll_period_lock": 1,
   "enable_payroll_readiness_check": 1,
-  "enable_whatsapp_notifications": 0,
   "escalation_days": 2,
   "escalation_email": null,
   "half_day_cutoff_time": "13:22:49.148953",
@@ -37,15 +36,12 @@
   "meal_lunch_close": "13:22:49.149383",
   "meal_lunch_open": "13:22:49.149336",
   "min_checkin_hours": 8.0,
-  "modified": null,
+  "modified": "2026-04-01 15:41:28.961893",
   "name": "Finstein HRMS Settings",
   "notification_sender_email": null,
   "payroll_notification_email": null,
   "restrict_to_current_month": 1,
   "shift_end_time": "13:22:49.149148",
-  "shift_start_time": "13:22:49.149060",
-  "whatsapp_api_token": null,
-  "whatsapp_api_url": null,
-  "whatsapp_sender_number": null
+  "shift_start_time": "13:22:49.149060"
  }
 ]

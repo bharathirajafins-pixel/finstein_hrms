@@ -19,13 +19,14 @@ function auto_fill_employee(frm) {
 
     const user_roles = frappe.user_roles;
 
-    // Check if user is Employee role (not HR Manager or Head)
+    // Check if user is Employee role (not an approver/admin role)
     const is_employee = user_roles.includes("Employee");
     const is_hr = user_roles.includes("HR Manager");
     const is_head = user_roles.includes("Head");
+    const is_ceo = user_roles.includes("CEO");
 
     // Only auto fill for pure Employee role
-    if (is_employee && !is_hr && !is_head) {
+    if (is_employee && !is_hr && !is_head && !is_ceo) {
 
         // Get Employee linked to current logged in user
         frappe.db.get_value(
